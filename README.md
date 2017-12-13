@@ -1,5 +1,10 @@
-# NLP_Project
-Combine Language Detection with ElasticSearch
+[![Build Status](https://travis-ci.org/floschne/NLP_Project.svg?branch=master)](https://travis-ci.org/floschne/NLP_Project)
 
-# TODO 
-  - Read me update
+# NLP Project LSIRES
+Natural Language Project - Language Specific Information Retrieval with ElasticSearch
+This is students M.Sc. project on NLP lecture from University of Hamburg
+## Basic Idea
+The basic idea is to detect the language of a query and get query results of ElasticSearch only in the detected language.
+
+
+
