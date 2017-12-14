@@ -5,5 +5,6 @@ jdk:
   - oraclejdk9
 
 script:
+  - cd dev/
   - mvn clean verify
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
