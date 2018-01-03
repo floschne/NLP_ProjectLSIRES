@@ -2,6 +2,11 @@ package dataInput;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+import java.io.IOException;
 
 public class WikiHttpApiLoaderTest {
 
@@ -17,9 +22,29 @@ public class WikiHttpApiLoaderTest {
     @Test
     public void addApiResponseAsContentToArticle_Test() {
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
-        WikiArticle article = new WikiArticle("Pizza", WikiArticle.Language.DE);
-        loader.addApiResponseAsContentToArticle(article, STATIC_PIZZA_RESPONSE);
+        try {
+            loader.createArticleFromApiResponse("Pizza", WikiArticle.Language.DE, STATIC_PIZZA_RESPONSE);
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //TODO more detailed testing..
+    }
+
+    @Test
+    public void loadArticle_Test() throws IOException {
+        String title = "Pizza";
+        WikiArticle.Language lang = WikiArticle.Language.DE;
+        WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
+        WikiArticle article = loader.loadArticle(title, lang);
+        Assert.assertNotNull(article);
+        Assert.assertEquals(article.getTitle(), title);
+        Assert.assertEquals(article.getLanguage(), lang);
     }
 
     //TODO more testing! (if we need.. think of time)

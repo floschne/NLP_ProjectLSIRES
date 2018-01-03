@@ -1,8 +1,17 @@
 package dataInput;
 
 import org.apache.http.client.fluent.Request;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.*;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,11 +39,12 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
         return singleton;
     }
 
-    private static String WIKI_API_BASE_URL_LANGUAGE_TOKEN = "<lang>";
-    private static String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
-    private static String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
-    private static String DEFAULT_FORMAT = "xml";
-    private static String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
+    private static final String WIKI_API_BASE_URL_LANGUAGE_TOKEN = "<lang>";
+    private static final String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
+    private static final String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
+    private static final String DEFAULT_FORMAT = "xml";
+    private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
+    private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
 
 
     private static String WIKI_API_BASE_URL = "https://" + WIKI_API_BASE_URL_LANGUAGE_TOKEN +
@@ -56,9 +66,22 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
                 .replace(WIKI_API_BASE_URL_TITLE_TOKEN, title);
     }
 
-    void addApiResponseAsContentToArticle(WikiArticle article, String apiResponse) {
+    /**
+     * Creates an @{@link WikiArticle} from an API response
+     * @param title the title of the @{@link WikiArticle}
+     * @param language the language of  @{@link WikiArticle}
+     * @param apiResponse the XML formatted response from the API call
+     * @return the resulting @{@link WikiArticle}
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws XPathExpressionException
+     * @throws IOException
+     */
+    WikiArticle createArticleFromApiResponse(String title, WikiArticle.Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+        WikiArticle article = new WikiArticle(title, language);
+        String articleContent = extractArticleContentFromApiResponse(apiResponse);
         //get contents as list
-        List<String> contents = Arrays.asList(apiResponse.split(API_RESPONSE_HEADING_REGEX_PATTERN));
+        List<String> contents = Arrays.asList(articleContent.split(API_RESPONSE_HEADING_REGEX_PATTERN));
 
         //get the headings as list
         List<String> headings = new ArrayList<>();
@@ -77,6 +100,32 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
                 //so we have to shift the index by -1 to get the correct content..
                 article.addContent(headings.get(i - 1), contents.get(i));
         }
+        return article;
+    }
+
+    /**
+     * Extracts the textual content from the XML formatted API response via XPath
+     * @param apiResponse the API response in XML format
+     * @return the textual content from the XML formatted API response via XPath
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws XPathExpressionException
+     */
+    private String extractArticleContentFromApiResponse(String apiResponse) throws IOException, SAXException, ParserConfigurationException, XPathExpressionException {
+        //parse response as XML
+        DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
+        Document document = documentBuilder.parse(new InputSource(new StringReader(apiResponse)));
+
+        //extract content via XPath
+        XPathFactory xpathFactory = XPathFactory.newInstance();
+        XPath xpath = xpathFactory.newXPath();
+        XPathExpression expression = xpath.compile(API_RESPONSE_ARTICLE_CONTENT_XPATH);
+        NodeList nodes = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
+        assert(nodes.getLength() == 1);
+
+        return nodes.item(0).getTextContent();
     }
 
     /**
@@ -90,13 +139,16 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
     @Override
     public WikiArticle loadArticle(String title, WikiArticle.Language language) throws MissingResourceException, IOException {
         //execute HTTP GET via Apache Fluent HC
-        String response = Request.Get(generateApiCallForQuery(language, title)).execute().returnContent().asString();
+        String apiCall = generateApiCallForQuery(language, title);
+        String response = Request.Get(apiCall).execute().returnContent().asString();
 
-        WikiArticle article = new WikiArticle(title, language);
 
-        addApiResponseAsContentToArticle(article, response);
-
-        return article;
+        try {
+            return createArticleFromApiResponse(title, language, response);
+        } catch (SAXException | ParserConfigurationException | XPathExpressionException  e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     /**

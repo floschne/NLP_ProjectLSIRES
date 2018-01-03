@@ -1,7 +1,8 @@
 package dataInput;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 /**
  * Represents an article from Wikipedia
@@ -27,12 +28,12 @@ public class WikiArticle {
         }
     }
 
-    public static String WIKI_ARTICLE_INTRO_HEADING = "= Introduction =";
+    public static final String WIKI_ARTICLE_INTRO_HEADING = "= Introduction =\n";
 
     private String title;
     private Language language;
-    //map from heading to content
-    private Map<String, String> content;
+    //List of pairs <heading, content> representing the sections of an article
+    private List<Pair<String, String>> content;
 
     public WikiArticle(String t, Language l) {
         if (t == null || t.isEmpty())
@@ -42,10 +43,45 @@ public class WikiArticle {
 
         this.title = t;
         this.language = l;
-        this.content = new HashMap<>();
+        this.content = new ArrayList<>();
     }
 
     public void addContent(String heading, String content) {
-        this.content.put(heading, content);
+        this.content.add(Pair.of(heading, content));
+    }
+
+    public List<String> getHeadings() {
+        List<String> headings = new ArrayList<>();
+        for(Pair<String, String> section : content)
+            headings.add(section.getKey());
+
+        return headings;
+    }
+
+    public List<Pair<String, String>> getContent() {
+        return content;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Language getLanguage() {
+        return language;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("WikiArticle{\ntitle='").append(title).append("',\n");
+        sb.append("language=").append(language).append(",\n");
+        sb.append("content=\n");
+
+        for(Pair<String, String> section : content)
+            sb.append(section.getKey()).append(section.getValue());
+
+        sb.append("\n}");
+
+        return sb.toString();
     }
 }
