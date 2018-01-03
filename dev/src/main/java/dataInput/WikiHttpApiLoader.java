@@ -26,6 +26,13 @@ import java.util.regex.Pattern;
  */
 public class WikiHttpApiLoader implements WikiArticleLoader {
 
+    private static final String WIKI_API_BASE_URL_LANGUAGE_TOKEN = "<lang>";
+    private static final String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
+    private static final String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
+    private static final String DEFAULT_FORMAT = "xml";
+    private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
+    private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
+
     //TODO think of alternative content to return (such as categories of article etc)
 
     private static WikiHttpApiLoader singleton = null;
@@ -38,14 +45,6 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
             singleton = new WikiHttpApiLoader();
         return singleton;
     }
-
-    private static final String WIKI_API_BASE_URL_LANGUAGE_TOKEN = "<lang>";
-    private static final String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
-    private static final String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
-    private static final String DEFAULT_FORMAT = "xml";
-    private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
-    private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
-
 
     private static String WIKI_API_BASE_URL = "https://" + WIKI_API_BASE_URL_LANGUAGE_TOKEN +
             ".wikipedia.org/w/api.php?action=query&prop=extracts&explaintext" +
@@ -77,6 +76,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @throws XPathExpressionException
      * @throws IOException
      */
+    //explicit package private scope !
     WikiArticle createArticleFromApiResponse(String title, WikiArticle.Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         WikiArticle article = new WikiArticle(title, language);
         String articleContent = extractArticleContentFromApiResponse(apiResponse);
