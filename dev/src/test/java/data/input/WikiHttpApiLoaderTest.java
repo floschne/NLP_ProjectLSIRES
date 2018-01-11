@@ -1,4 +1,4 @@
-package dataInput;
+package data.input;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -101,13 +101,13 @@ public class WikiHttpApiLoaderTest {
             "== Einzelnachweise ==</extract></page></pages></query></api>";
 
     @Test
-    public void singleton_Test() {
+    public void singletonTest() {
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
         Assert.assertNotNull(loader);
     }
 
     @Test
-    public void addApiResponseAsContentToArticle_Test() {
+    public void addApiResponseAsContentToArticleTest() {
         String title = "Pizza";
         WikiArticle.Language lang = WikiArticle.Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
@@ -129,7 +129,7 @@ public class WikiHttpApiLoaderTest {
     }
 
     @Test
-    public void loadArticle_Test() throws IOException {
+    public void loadArticleTest() throws IOException {
         String title = "Pizza";
         WikiArticle.Language lang = WikiArticle.Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();

@@ -1,35 +1,55 @@
-package dataInput;
+package data.input;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.uima.UimaContext;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
+import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Progress;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Reads @{@link WikiArticle}s and adds it to the JCas
  */
 public class WikiArticleReader extends JCasCollectionReader_ImplBase {
+    public static final String PARAM_LIST_OF_ARTICLES_FILE = "ListOfArticlesFile";
+    @ConfigurationParameter(name = PARAM_LIST_OF_ARTICLES_FILE, description="Sets text file encoding for i/o", mandatory=true, defaultValue="utf-8")
 
     //the WikiArticleLoader that'll be used to provide the articles
     private WikiArticleLoader wikiArticleLoader;
     //will contain the articles that are already loaded
     private List<WikiArticle> wikiArticles;
     //List of tuples of title and language of the articles that should be added to the JCAS (aka processed by the reader)
-    //TODO make this mandatory and with UIMA parameter to create enginge..
-    private List<Pair<WikiArticle.Language, String>> wikiContentToProcess; //TODO better name?
+    private List<Pair<WikiArticle.Language, String>> wikiArticlesToProcess;
 
-    public WikiArticleReader() {
+    private Integer currentArticleIdx;
+
+    /**
+     * This method should be overwritten by subclasses.
+     *
+     * @param context the UIMA context the component is running in
+     * @throws ResourceInitializationException if a failure occurs during initialization.
+     */
+    @Override
+    public void initialize(UimaContext context) throws ResourceInitializationException {
+        super.initialize(context);
+
         this.wikiArticleLoader = WikiHttpApiLoader.getInstance();
+
+
     }
 
-    public WikiArticleReader(WikiArticleLoader loader) {
-        if(loader == null)
-            throw new IllegalArgumentException("WikiArticleLoader must not be null or empty!");
-        this.wikiArticleLoader = loader;
+    private List<Pair<WikiArticle.Language, String>> readArticleListFile() {
+        List<Pair<WikiArticle.Language, String>> articles = new ArrayList<>();
+
+
+
+        return articles;
     }
 
     /**

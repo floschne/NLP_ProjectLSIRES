@@ -1,4 +1,4 @@
-package dataInput;
+package data.input;
 
 import org.apache.http.client.fluent.Request;
 import org.w3c.dom.Document;
@@ -30,6 +30,10 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
     private static final String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
     private static final String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
     private static final String DEFAULT_FORMAT = "xml";
+    private static String WIKI_API_BASE_URL = "https://" + WIKI_API_BASE_URL_LANGUAGE_TOKEN +
+            ".wikipedia.org/w/api.php?action=query&prop=extracts&explaintext" +
+            "&format=" + WIKI_API_BASE_URL_FORMAT_TOKEN +
+            "&titles=" + WIKI_API_BASE_URL_TITLE_TOKEN;
     private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
     private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
 
@@ -45,11 +49,6 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
             singleton = new WikiHttpApiLoader();
         return singleton;
     }
-
-    private static String WIKI_API_BASE_URL = "https://" + WIKI_API_BASE_URL_LANGUAGE_TOKEN +
-            ".wikipedia.org/w/api.php?action=query&prop=extracts&explaintext" +
-            "&format=" + WIKI_API_BASE_URL_FORMAT_TOKEN +
-            "&titles=" + WIKI_API_BASE_URL_TITLE_TOKEN;
 
     /**
      * Generates the API call in form of a String containing the URL
@@ -67,8 +66,9 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
 
     /**
      * Creates an @{@link WikiArticle} from an API response
-     * @param title the title of the @{@link WikiArticle}
-     * @param language the language of  @{@link WikiArticle}
+     *
+     * @param title       the title of the @{@link WikiArticle}
+     * @param language    the language of  @{@link WikiArticle}
      * @param apiResponse the XML formatted response from the API call
      * @return the resulting @{@link WikiArticle}
      * @throws SAXException
@@ -76,7 +76,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @throws XPathExpressionException
      * @throws IOException
      */
-    //explicit package private scope !
+    // explicit package private scope for testing since using reflection is not really necessary here in my opinion
     WikiArticle createArticleFromApiResponse(String title, WikiArticle.Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         WikiArticle article = new WikiArticle(title, language);
         String articleContent = extractArticleContentFromApiResponse(apiResponse);
@@ -105,6 +105,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
 
     /**
      * Extracts the textual content from the XML formatted API response via XPath
+     *
      * @param apiResponse the API response in XML format
      * @return the textual content from the XML formatted API response via XPath
      * @throws IOException
@@ -123,7 +124,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
         XPath xpath = xpathFactory.newXPath();
         XPathExpression expression = xpath.compile(API_RESPONSE_ARTICLE_CONTENT_XPATH);
         NodeList nodes = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
-        assert(nodes.getLength() == 1);
+        assert (nodes.getLength() == 1);
 
         return nodes.item(0).getTextContent();
     }
@@ -145,22 +146,9 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
 
         try {
             return createArticleFromApiResponse(title, language, response);
-        } catch (SAXException | ParserConfigurationException | XPathExpressionException  e) {
+        } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
             e.printStackTrace();
         }
-        return null;
-    }
-
-    /**
-     * Downloads the articles from Wikipedia with title @title in the languages @languages and returns it as a set of @{@link WikiArticle}
-     *
-     * @param title     the title of the article
-     * @param languages the languages of the article
-     * @return a set containing the @{@link WikiArticle}s. If an article cannot be found in the specific language it'll be ignored
-     */
-    @Override
-    public Set<WikiArticle> loadArticleInMultipleLanguages(String title, Set<WikiArticle.Language> languages) {
-        //TODO do we really need this? 2lazy2code..
         return null;
     }
 }

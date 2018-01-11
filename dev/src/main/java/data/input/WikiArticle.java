@@ -1,4 +1,4 @@
-package dataInput;
+package data.input;
 
 import org.apache.commons.lang3.tuple.Pair;
 
