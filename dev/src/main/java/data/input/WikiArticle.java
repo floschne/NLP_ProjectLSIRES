@@ -70,6 +70,14 @@ public class WikiArticle {
         return language;
     }
 
+    public String getContentAsString() {
+        StringBuilder sb = new StringBuilder();
+        for(Pair<String, String> section : content)
+            sb.append(section.getKey()).append(section.getValue());
+
+        return sb.toString();
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
