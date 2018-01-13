@@ -7,5 +7,9 @@ This is students M.Sc. project on NLP lecture from University of Hamburg
 ## Basic Idea
 The basic idea is to detect the language of a query and get query results of ElasticSearch only in the detected language.
 
+## How To Run the Webinterface
+* Run ```cd dev/web/ && mvn spring-boot:run```
+* Open [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
-
+## Testing
+Run ```mvn clean verify```
