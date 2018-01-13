@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<title>LSIRES - Search</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-flat.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+<body>
+
+<div class="w3-container">
+    <div class="w3-card-4">
+        <div class="w3-container w3-green">
+            <h2>Welcome to LSIRES: Search</h2>
+        </div>
+
+        <form class="w3-display-middle" action="#" th:action="@{/}" th:object="${query}" method="post">
+            <p>
+                <input class="w3-input w3-border" type="text" placeholder="Query String" th:field="*{value}"/>
+            </p>
+            <p>
+                <button class="w3-btn w3-block w3-teal">
+                    <i class="fa fa-search"></i>
+                    <input class="w3-teal w3-btn" type="submit" value="Search..."/>
+                </button>
+            </p>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
