@@ -12,8 +12,6 @@ public class WikiArticle {
     public enum Language {
         EN("en"),
         DE("de"),
-        FR("fr"),
-        IT("it"),
         ES("es");
 
         private final String languageCode;
@@ -52,7 +50,7 @@ public class WikiArticle {
 
     public List<String> getHeadings() {
         List<String> headings = new ArrayList<>();
-        for(Pair<String, String> section : content)
+        for (Pair<String, String> section : content)
             headings.add(section.getKey());
 
         return headings;
@@ -72,7 +70,7 @@ public class WikiArticle {
 
     public String getContentAsString() {
         StringBuilder sb = new StringBuilder();
-        for(Pair<String, String> section : content)
+        for (Pair<String, String> section : content)
             sb.append(section.getKey()).append(section.getValue());
 
         return sb.toString();
@@ -85,7 +83,7 @@ public class WikiArticle {
         sb.append("language=").append(language).append(",\n");
         sb.append("content=\n");
 
-        for(Pair<String, String> section : content)
+        for (Pair<String, String> section : content)
             sb.append(section.getKey()).append(section.getValue());
 
         sb.append("\n}");

@@ -149,6 +149,19 @@ public class PopularWikiArticlesListBuilder {
         return getListOfMostPopularWikiArticles(lang, null, null, null, 1000);
     }
 
+
+
+    /**
+     * Returns the list of titles of the most popular Wikipedia Articles
+     *
+     * @param lang the Language of the Wikipedia Articles
+     * @param limit the limit of articles that should be returned
+     * @throws IOException
+     */
+    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer limit) throws IOException {
+        return getListOfMostPopularWikiArticles(lang, null, null, null, limit);
+    }
+
     /**
      * serializes a list of most popular Wikipedia Articles to a file
      *

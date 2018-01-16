@@ -11,8 +11,10 @@ import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
 import org.apache.uima.util.Progress;
+import org.apache.uima.util.ProgressImpl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,9 +22,15 @@ import java.util.List;
  */
 public class WikiArticleReader extends JCasCollectionReader_ImplBase {
     public static final String PARAM_ARTICLE_TITLE_FILES = "ListOfArticlesFile";
-    @ConfigurationParameter(name = PARAM_ARTICLE_TITLE_FILES, description = "A comma-separated list of files containing a list of titles of Wikipedia Articles that get processed in this reader", mandatory = true, defaultValue = "utf-8")
+    @ConfigurationParameter(name = PARAM_ARTICLE_TITLE_FILES, description = "A comma-separated list of files containing a list of titles of Wikipedia Articles that get processed in this reader", mandatory = false, defaultValue = "utf-8")
     private String listOfArticleTitleFiles;
 
+
+    public static final String PARAM_NUMBER_OF_POPULAR_ARTICLES = "NumberOfPopularArticles";
+    @ConfigurationParameter(name = PARAM_NUMBER_OF_POPULAR_ARTICLES, description = "The number of popular Wikipedia Articles that should be processed by the WikiArticleReader", mandatory = false)
+    private Integer numberOfPopularArticles;
+
+    private static final Boolean useFilesOfArticles = false;
 
     private Logger logger = null;
 
@@ -48,10 +56,29 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
         this.wikiArticleLoader = WikiHttpApiLoader.getInstance();
 
         try {
-            // deserialize the Wikipedia Article Files and initialize wikiArticlesToProcess
-            String[] titleFiles = listOfArticleTitleFiles.split(",");
-            logger.log(Level.INFO, "Deserializing Wikipedia Article Titles from files: '" + listOfArticleTitleFiles.replace(",", " ") + "' !");
-            wikiArticlesToProcess = PopularWikiArticlesListBuilder.deserializeListOfMostPopularWikiArticlesFromCsvFile(titleFiles);
+
+            if (useFilesOfArticles) {
+                // deserialize the Wikipedia Article Files and initialize wikiArticlesToProcess
+                String[] titleFiles = listOfArticleTitleFiles.split(",");
+                logger.log(Level.INFO, "Deserializing Wikipedia Article Titles from files: '" + listOfArticleTitleFiles.replace(",", " ") + "' !");
+                wikiArticlesToProcess = PopularWikiArticlesListBuilder.deserializeListOfMostPopularWikiArticlesFromCsvFile(titleFiles);
+            } else {
+                //TODO ugly code.. could reduce redundancy but quick n dirty first!
+                if (numberOfPopularArticles == null || numberOfPopularArticles > 1000)
+                    numberOfPopularArticles = 1000;
+                // get popular article titles of german, english and spanish wikipedia articles
+                List<String> popularArticleTitlesDe = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.DE, numberOfPopularArticles);
+                List<String> popularArticleTitlesEn = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.EN, numberOfPopularArticles);
+                List<String> popularArticleTitlesEs = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.ES, numberOfPopularArticles);
+                wikiArticlesToProcess = new ArrayList<>();
+                for (String title : popularArticleTitlesDe)
+                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.DE, title));
+                for (String title : popularArticleTitlesEn)
+                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.EN, title));
+                for (String title : popularArticleTitlesEs)
+                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.ES, title));
+            }
+
 
             // download the articles and save them in the wikiArticles list
             logger.log(Level.INFO, "Starting to download the Wikipedia Articles!");
@@ -74,8 +101,7 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
      */
     @Override
     public void getNext(JCas jCas) throws IOException, CollectionException {
-        //TODO have to talk about this in next meeting
-        //jCas.setDocumentText(wikiArticles.get(currentArticleIdx++).getContentAsString());
+        jCas.setDocumentText(wikiArticles.get(currentArticleIdx++).getContentAsString());
     }
 
     /**
@@ -89,9 +115,7 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
      */
     @Override
     public boolean hasNext() throws IOException, CollectionException {
-        //TODO have to talk about this in next meeting
-        //return currentArticleIdx < wikiArticles.size();
-        return false;
+        return currentArticleIdx < wikiArticles.size();
     }
 
     /**
@@ -109,8 +133,6 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
      */
     @Override
     public Progress[] getProgress() {
-        //TODO have to talk about this in next meeting
-        //return new Progress[] {new ProgressImpl(currentArticleIdx, wikiArticles.size(), Progress.ENTITIES)};
-        return null;
+        return new Progress[]{new ProgressImpl(currentArticleIdx, wikiArticles.size(), Progress.ENTITIES)};
     }
 }
