@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 public class AppController {
 
-    @GetMapping(Config.SEARCH_MAPPING_URL)
+    @GetMapping(RouteConfiguration.SEARCH_MAPPING_ROUTE)
     public String searchFrom(Model model) {
         model.addAttribute("query", new LSIRESQuery());
         return "search";
     }
 
-    @PostMapping(Config.RESULTS_MAPPING_URL)
+    @PostMapping(RouteConfiguration.RESULTS_MAPPING_ROUTE)
     public String searchSubmit(@ModelAttribute LSIRESQuery query) {
         return "results";
     }

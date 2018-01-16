@@ -1,5 +1,6 @@
 package app.controller;
 
+import controller.RouteConfiguration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +26,13 @@ public class AppControllerTest {
 
     @Test
     public void rendersForm() throws Exception {
-        mockMvc.perform(get(Config.SEARCH_MAPPING_URL))
+        mockMvc.perform(get(RouteConfiguration.SEARCH_MAPPING_ROUTE))
                 .andExpect(content().string(containsString("Welcome to LSIRES: Search")));
     }
 
     @Test
     public void submitsForm() throws Exception {
-        mockMvc.perform(post(Config.RESULTS_MAPPING_URL).param("value", queryValue))
+        mockMvc.perform(post(RouteConfiguration.RESULTS_MAPPING_ROUTE).param("value", queryValue))
                 .andExpect(content().string(containsString("Welcome to LSIRES: Results")))
                 .andExpect(content().string(containsString(queryValue)));
     }
