@@ -17,6 +17,7 @@ import org.apache.uima.util.ProgressImpl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Reads @{@link WikiArticle}s and adds it to the JCas
@@ -55,6 +56,8 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
         super.initialize(context);
         logger = context.getLogger();
         this.wikiArticleLoader = WikiHttpApiLoader.getInstance();
+        wikiArticles = new ArrayList<>();
+        currentArticleIdx = 0;
 
         try {
 
@@ -82,13 +85,10 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
 
 
             // download the articles and save them in the wikiArticles list
-            logger.log(Level.INFO, "Starting to download the Wikipedia Articles!");
-            for (Pair<Language, String> article : wikiArticlesToProcess) {
-                logger.log(Level.INFO, "Downloading Wikipedia Articles with title '" + article.getRight() + "'...");
-                wikiArticles.add(wikiArticleLoader.loadArticle(article.getRight(), article.getLeft()));
-            }
+            logger.log(Level.INFO, "Starting to download " + wikiArticlesToProcess.size() + " Wikipedia Articles!");
+            wikiArticles = wikiArticleLoader.loadArticles(wikiArticlesToProcess);
             logger.log(Level.INFO, "Finished downloading the Wikipedia Articles!");
-        } catch (IOException e) {
+        } catch (IOException | ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
     }

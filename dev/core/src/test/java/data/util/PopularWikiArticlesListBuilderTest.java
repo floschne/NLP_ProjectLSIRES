@@ -29,4 +29,27 @@ public class PopularWikiArticlesListBuilderTest {
             Assert.assertEquals(popularArticles.get(i), popularArticlesReverse.get(j));
         }
     }
+
+    @Test
+    public void getListOfMostPopularWikiArticlesLimitDETest() throws IOException {
+        int limit = 257;
+        List<String> popularArticles = getListOfMostPopularWikiArticles(Language.DE, 2017, 12, 1, 257, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+        Assert.assertEquals(popularArticles.size(), limit);
+    }
+
+
+    @Test
+    public void getListOfMostPopularWikiArticlesLimitENTest() throws IOException {
+        int limit = 257;
+        List<String> popularArticles = getListOfMostPopularWikiArticles(Language.EN, 2017, 12, 1, 257, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+        Assert.assertEquals(popularArticles.size(), limit);
+    }
+
+
+    @Test
+    public void getListOfMostPopularWikiArticlesLimitESTest() throws IOException {
+        int limit = 257;
+        List<String> popularArticles = getListOfMostPopularWikiArticles(Language.ES, 2017, 12, 1, 257, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+        Assert.assertEquals(popularArticles.size(), limit);
+    }
 }

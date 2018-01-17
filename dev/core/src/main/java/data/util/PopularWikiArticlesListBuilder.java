@@ -92,7 +92,7 @@ public class PopularWikiArticlesListBuilder {
         for (JsonElement a : articles) {
             String articleTitle = a.getAsJsonObject().get("article").toString().replace("\"", "");
             for (String ign : ignoredArticleTitles)
-                if (articleTitle.toLowerCase().contains(ign + API_RESPONSE_ARTICLE_CATEGORY_INDICATOR_TOKEN)) {
+                if (articleTitle.toLowerCase().contains(ign)) {
                     ignoreArticle = true;
                     break;
                 }
