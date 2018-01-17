@@ -11,8 +11,8 @@ import knowledgebase.DatabaseAccessException;
 import knowledgebase.DatabaseHandler;
 import knowledgebase.DatabaseModelException;
 
-import static data.input.WikiArticle.Language;
-import static data.input.WikiArticle.Language.*;
+import data.input.Language;
+import static data.input.Language.*;
 
 public class DatabaseTest {
 	private static final double DELTA = 0.000001;

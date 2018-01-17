@@ -1,6 +1,6 @@
 package knowledgebase;
 
-import data.input.WikiArticle.Language;
+import data.input.Language;
 
 import java.sql.SQLException;
 

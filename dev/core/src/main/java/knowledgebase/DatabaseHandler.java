@@ -5,7 +5,7 @@ import org.h2.*;
 import java.sql.*;
 import java.io.File;
 
-import static data.input.WikiArticle.Language;
+import data.input.Language;
 
 /**
  * Manages the database storing language information.
