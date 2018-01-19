@@ -1,4 +1,4 @@
-package app.controller;
+package controller;
 
 public class LSIRESQuery {
     private String value;
