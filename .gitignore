@@ -1,5 +1,9 @@
 # dont add target folder
 target/
+
+# Exclude generated database files
+dev/core/res/*/data/*
+
 # Created by https://www.gitignore.io/api/java,eclipse,intellij
 
 ### Eclipse ###
