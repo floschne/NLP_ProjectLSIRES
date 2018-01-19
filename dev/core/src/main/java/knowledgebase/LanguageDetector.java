@@ -1,6 +1,6 @@
 package knowledgebase;
 
-import static knowledgebase.DatabaseHandler.*;
+import data.input.WikiArticle.Language;
 
 import java.sql.SQLException;
 
@@ -11,12 +11,15 @@ import org.apache.uima.jcas.JCas;
 
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 
+import static knowledgebase.DatabaseHandler.DEFAULT_LOCATION;
+import static knowledgebase.DatabaseHandler.DATABASE_USER;
+import static knowledgebase.DatabaseHandler.DATABASE_PASSWORD;
+
 public class LanguageDetector extends JCasConsumer_ImplBase {
 	@Override
 	public void process(JCas aJCas) throws AnalysisEngineProcessException {
 		// TODO Use ConfigurationParameter
 		try (DatabaseHandler handler = new DatabaseHandler(DEFAULT_LOCATION, DATABASE_USER, DATABASE_PASSWORD)) {
-			// XXX Use WikiArticle.Language
 			Language[] languages = Language.values();
 			double[] sumProbability = new double[languages.length];
 			// TODO Use proper annotation type

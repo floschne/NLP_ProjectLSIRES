@@ -5,6 +5,8 @@ import org.h2.*;
 import java.sql.*;
 import java.io.File;
 
+import static data.input.WikiArticle.Language;
+
 /**
  * Manages the database storing language information.
  *
@@ -27,22 +29,6 @@ public class DatabaseHandler implements AutoCloseable {
 	private static final String COLUMN_TOKENFREQ_TOKEN = "token";
 	
 	private Connection con = null;
-	
-	// XXX Replace by WikiArticle.Language
-	public enum Language {
-		EN("en"), DE("de"), FR("fr"), IT("it"), ES("es");
-
-		private final String languageCode;
-
-		Language(final String languageCode) {
-			this.languageCode = languageCode;
-		}
-
-		@Override
-		public String toString() {
-			return languageCode;
-		}
-	}	
 	
 	/**
 	 * <p>Establishes a connection to the database.</p>
@@ -69,7 +55,6 @@ public class DatabaseHandler implements AutoCloseable {
 	 * @throws SQLException if an exception occurs while accessing the database
 	 * @throws DatabaseAccessException if the database is already closed
 	 */
-	// XXX Use WikiArticle.Language instead of DatabaseHandler.Language
 	private void createTables() throws SQLException, DatabaseAccessException {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
@@ -100,7 +85,6 @@ public class DatabaseHandler implements AutoCloseable {
 	 * @throws SQLException if an exception occurs while accessing the database
 	 * @throws DatabaseAccessException if the database is already closed
 	 */
-	// XXX Use WikiArticle.Language instead of DatabaseHandler.Language
 	public void updateStatisticsForToken(String token, Language language) throws SQLException, DatabaseAccessException {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
@@ -191,7 +175,6 @@ public class DatabaseHandler implements AutoCloseable {
 	 * @throws DatabaseAccessException if the database is already closed
 	 * @throws DatabaseModelException if there is no data for the specified language in the database
 	 */
-	// XXX Use WikiArticle.Language instead of DatabaseHandler.Language
 	public double tokenLikelihoodGivenLanguage(String token, Language language) throws SQLException, DatabaseAccessException, DatabaseModelException {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
@@ -221,7 +204,6 @@ public class DatabaseHandler implements AutoCloseable {
 	 * @throws DatabaseAccessException if the database is already closed
 	 * @throws DatabaseModelException if there is no data for the specified language in the database
 	 */
-	// XXX Use WikiArticle.Language instead of DatabaseHandler.Language
 	public double languageLikelihoodGivenToken(String token, Language language) throws SQLException, DatabaseAccessException {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
