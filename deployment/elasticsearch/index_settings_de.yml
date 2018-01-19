@@ -1,0 +1,61 @@
+{
+  "settings": {
+    "analysis": {
+      "filter": {
+        "german_stop": {
+          "type":       "stop",
+          "stopwords":  "_german_"
+        },
+        "german_keywords": {
+          "type":       "keyword_marker",
+          "keywords":   ["Beispiel"]
+        },
+        "german_stemmer": {
+          "type":       "stemmer",
+          "language":   "light_german"
+        }
+      },
+      "analyzer": {
+        "german_text": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase",
+            "german_stop",
+            "german_keywords",
+            "german_normalization",
+            "german_stemmer"
+          ]
+        },
+        "german_title": {
+          "tokenizer":  "standard",
+          "filter": [
+            "lowercase",
+            "german_stop",
+            "german_keywords",
+            "german_normalization"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "article": {
+      "properties": {
+        "title": {
+          "type": "text",
+          "analyzer": "german_title"
+        },
+        "content": {
+          "type": "text",
+          "analyzer": "german_text",
+          "store": true
+        }
+      },
+      "_source": {
+        "excludes": [
+          "content"
+        ]
+      }
+    }
+  }
+}
