@@ -90,4 +90,8 @@ public class WikiArticle {
 
         return sb.toString();
     }
+
+    public String getArticleId() {
+        return language.toString() + ";" + title;
+    }
 }
