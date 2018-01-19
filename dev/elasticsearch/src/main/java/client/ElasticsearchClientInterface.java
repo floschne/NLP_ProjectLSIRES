@@ -1,6 +1,8 @@
 package client;
 
 import data.input.WikiArticle;
+
+import java.io.IOException;
 import java.util.List;
 
 public interface ElasticsearchClientInterface {
@@ -15,14 +17,12 @@ public interface ElasticsearchClientInterface {
 
     /**
      * @param wikiArticle Article to index
-     * @return void
      */
-    boolean indexArticle(WikiArticle wikiArticle);
+    void indexArticle(WikiArticle wikiArticle) throws IOException;
 
     /**
      * @param wikiArticles List of the articles to index
-     * @return void
      */
-    boolean indexArticles(List<WikiArticle> wikiArticles);
+    void indexArticles(List<WikiArticle> wikiArticles);
 
 }

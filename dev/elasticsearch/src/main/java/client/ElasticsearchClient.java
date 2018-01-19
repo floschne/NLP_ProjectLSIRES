@@ -7,18 +7,20 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class ElasticsearchClient implements ElasticsearchClientInterface{
 
     // default config
     private static final String CLUSTER_NAME =  "docker-cluster";
     private static final int TRANSPORT_TCP_PORT =  9201;
+    private static final String TYPE_NAME =  "article";
     private static final List<String> CLUSTER_SERVERS =  Collections.unmodifiableList(Collections.singletonList("127.0.0.1"));
 
     private TransportClient client = null;
@@ -67,12 +69,18 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
     }
 
     @Override
-    public boolean indexArticle(WikiArticle wikiArticle) {
-        return false; // todo
+    public void indexArticle(WikiArticle wikiArticle) throws IOException {
+        client.prepareIndex(wikiArticle.getLanguage().toString(), TYPE_NAME, wikiArticle.getArticleId())
+                .setSource(jsonBuilder()
+                        .startObject()
+                        .field("title", wikiArticle.getTitle())
+                        .field("content", wikiArticle.getContent())
+                        .endObject()
+                )
+                .get();
     }
 
     @Override
-    public boolean indexArticles(List<WikiArticle> wikiArticles) {
-        return false; // todo
+    public void indexArticles(List<WikiArticle> wikiArticles) {
     }
 }
