@@ -23,6 +23,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,7 +31,6 @@ import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
 public class ElasticSearchTest {
-
     // todo: maybe outsource to config file
     // config
     private static final String CLUSTER_NAME =  "docker-cluster";
@@ -61,6 +61,7 @@ public class ElasticSearchTest {
     }
 
     @Test
+    @Ignore
     public void generateAndDeleteTestIndexTest() throws ExecutionException, InterruptedException {
 
         // create index
@@ -76,6 +77,7 @@ public class ElasticSearchTest {
     }
 
     @Test
+    @Ignore
     public void getAllIndexesTest() throws ExecutionException, InterruptedException {
 
         ActionFuture<GetIndexResponse> getIndexResponseActionFuture = this.client.admin().indices().getIndex(new GetIndexRequest());
@@ -86,6 +88,7 @@ public class ElasticSearchTest {
     }
 
     @Test
+    @Ignore
     public void checkClusterHealthTest(){
         ClusterHealthResponse response = this.client.admin()
                 .cluster()

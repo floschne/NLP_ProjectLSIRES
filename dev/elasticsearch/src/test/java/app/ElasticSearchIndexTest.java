@@ -20,6 +20,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -29,7 +30,6 @@ import java.util.concurrent.ExecutionException;
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 public class ElasticSearchIndexTest {
-
     // todo: maybe outsource to config file
     // config
     private static final String CLUSTER_NAME =  "docker-cluster";
@@ -60,6 +60,7 @@ public class ElasticSearchIndexTest {
     }
 
     @Test
+    @Ignore
     public void testIndexing() throws IOException {
 
         String content = "Rotherbaum (niederdeutsch: Rothenboom) ist ein Stadtteil im Bezirk Eimsbüttel der Freien und Hansestadt Hamburg. Oft bezeichnet Rotherbaum auch ein größeres Quartier um die Rothenbaumchaussee.\n" +
