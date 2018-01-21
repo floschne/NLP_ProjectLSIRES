@@ -12,8 +12,9 @@ jdk:
 script:
   - docker --version
   - docker-compose --version
-  - cd deployment/elasticsearch
-  - docker-compose up -d
-  - cd ../../dev
+    #- cd deployment/elasticsearch
+    #- docker-compose up -d
+    #- cd ../../dev
+  - cd dev
   - mvn clean verify
   - mvn install -Dmaven.javadoc.skip=true -B -V
