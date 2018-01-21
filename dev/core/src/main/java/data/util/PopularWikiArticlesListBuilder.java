@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import data.input.WikiArticle;
+import data.input.Language;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.fluent.Request;
 
@@ -46,7 +46,7 @@ public class PopularWikiArticlesListBuilder {
      * @param day   the day from which the ranking for the most popular pages gets loaded
      * @return the API Call URL as a String
      */
-    private static String generateApiCallFromParameters(WikiArticle.Language lang, Integer year, Integer month, Integer day) {
+    private static String generateApiCallFromParameters(Language lang, Integer year, Integer month, Integer day) {
         if (lang == null)
             throw new IllegalArgumentException("Language must not be null!");
         if (year == null)
@@ -78,8 +78,7 @@ public class PopularWikiArticlesListBuilder {
      *
      * @param response the JSON encoded response from the API Call
      * @param limit    the limit of articles that should be loaded
-     * @param ordering
-s     * @return the titles of the articles as a list of Strings
+     * @param ordering s     * @return the titles of the articles as a list of Strings
      */
     private static List<String> filterResponseForArticles(String response, Integer limit, ListOrdering ordering) {
         List<String> popularArticles = new ArrayList<>();
@@ -132,7 +131,7 @@ s     * @return the titles of the articles as a list of Strings
      * @return the titles of the most popular Wikipedia Articles as a list of Strings
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
+    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
         String apiCall = generateApiCallFromParameters(lang, year, month, day);
         String response = Request.Get(apiCall).execute().returnContent().asString();
 
@@ -147,7 +146,7 @@ s     * @return the titles of the articles as a list of Strings
      * @param limit the limit of articles that should be returned
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer limit, ListOrdering ordering) throws IOException {
+    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer limit, ListOrdering ordering) throws IOException {
         return getListOfMostPopularWikiArticles(lang, null, null, null, limit, ordering);
     }
 
@@ -159,7 +158,7 @@ s     * @return the titles of the articles as a list of Strings
      * @param articles         the list of popular Wikipedia Articles
      * @param writeToResources TODO flag to write file to resource folder
      */
-    public static void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, WikiArticle.Language lang, List<String> articles, Boolean writeToResources) {
+    public static void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, Language lang, List<String> articles, Boolean writeToResources) {
         try {
             Writer writer = new FileWriter(new File(fileName));
             /* TODO make it possible to create file in resource folder without hard coding path..
@@ -196,8 +195,8 @@ s     * @return the titles of the articles as a list of Strings
      * @return a list of pairs "<lang>,<title>" containing the language and title of the popular article
      * @throws IOException
      */
-    public static List<Pair<WikiArticle.Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
-        List<Pair<WikiArticle.Language, String>> popularArticles = new ArrayList<>();
+    public static List<Pair<Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
+        List<Pair<Language, String>> popularArticles = new ArrayList<>();
         BufferedReader reader;
         String line;
         String[] entry;
@@ -207,7 +206,7 @@ s     * @return the titles of the articles as a list of Strings
                 entry = line.split(",");
                 if (entry.length != 2)
                     throw new InputMismatchException("Each entry i.e. line in the file has to be in the format <lang>,<title>");
-                popularArticles.add(Pair.of(WikiArticle.Language.valueOf(entry[0]), entry[1]));
+                popularArticles.add(Pair.of(Language.valueOf(entry[0]), entry[1]));
             }
         }
 
