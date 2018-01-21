@@ -9,10 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.fluent.Request;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility class to get the list of the most popular Wikipedia Articles (based on pageviews)
@@ -33,6 +30,12 @@ public class PopularWikiArticlesListBuilder {
     private static final Integer DEFAULT_YEAR = 2017;
     private static final Integer DEFAULT_MONTH = 12;
     private static final Integer DEFAULT_DAY = 10;
+
+    public enum ListOrdering {
+        ASC,
+        DESC,
+        SHUF;
+    }
 
     /**
      * generates the API Call URL based on the parameters
@@ -75,9 +78,10 @@ public class PopularWikiArticlesListBuilder {
      *
      * @param response the JSON encoded response from the API Call
      * @param limit    the limit of articles that should be loaded
-     * @return the titles of the articles as a list of Strings
+     * @param ordering
+s     * @return the titles of the articles as a list of Strings
      */
-    private static List<String> filterResponseForArticles(String response, Integer limit) {
+    private static List<String> filterResponseForArticles(String response, Integer limit, ListOrdering ordering) {
         List<String> popularArticles = new ArrayList<>();
 
         JsonElement jElement = new JsonParser().parse(response);
@@ -100,7 +104,18 @@ public class PopularWikiArticlesListBuilder {
             if (popularArticles.size() < limit)
                 popularArticles.add(articleTitle);
             else
-                return popularArticles;
+                break;
+        }
+
+        switch (ordering) {
+            case ASC:
+                break;
+            case DESC:
+                Collections.reverse(popularArticles);
+                break;
+            case SHUF:
+                Collections.shuffle(popularArticles);
+                break;
         }
 
         return popularArticles;
@@ -117,49 +132,23 @@ public class PopularWikiArticlesListBuilder {
      * @return the titles of the most popular Wikipedia Articles as a list of Strings
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day, Integer limit) throws IOException {
+    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
         String apiCall = generateApiCallFromParameters(lang, year, month, day);
         String response = Request.Get(apiCall).execute().returnContent().asString();
 
-        return filterResponseForArticles(response, limit);
+        return filterResponseForArticles(response, limit, ordering);
     }
+
 
     /**
      * Returns the list of titles of the most popular Wikipedia Articles
      *
      * @param lang  the Language of the Wikipedia Articles
-     * @param year  the year
-     * @param month the month
-     * @param day   the day from which the ranking for the most popular pages gets loaded
-     * @return the titles of the most popular Wikipedia Articles as a list of Strings
-     * @throws IOException
-     */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, year, month, day, 1000);
-    }
-
-
-    /**
-     * Returns the list of titles of the most popular Wikipedia Articles
-     *
-     * @param lang the Language of the Wikipedia Articles
-     * @throws IOException
-     */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, null, null, null, 1000);
-    }
-
-
-
-    /**
-     * Returns the list of titles of the most popular Wikipedia Articles
-     *
-     * @param lang the Language of the Wikipedia Articles
      * @param limit the limit of articles that should be returned
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer limit) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, null, null, null, limit);
+    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer limit, ListOrdering ordering) throws IOException {
+        return getListOfMostPopularWikiArticles(lang, null, null, null, limit, ordering);
     }
 
     /**
@@ -225,25 +214,5 @@ public class PopularWikiArticlesListBuilder {
         return popularArticles;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Generating CSV files containing list of the most popular Wikipedia Articles!");
-
-        //ONLY WORKS FOR UNIX SYSTEMS DUE TO PATH IN FILE NAMES!
-        String deFileName = "/tmp/popularWikiArticles_de.csv";
-        String enFileName = "/tmp/popularWikiArticles_en.csv";
-        String esFileName = "/tmp/popularWikiArticles_es.csv";
-
-        try {
-            List<String> de = getListOfMostPopularWikiArticles(WikiArticle.Language.DE);
-            List<String> en = getListOfMostPopularWikiArticles(WikiArticle.Language.EN);
-            List<String> es = getListOfMostPopularWikiArticles(WikiArticle.Language.ES);
-
-            serializeListOfMostPopularWikiArticlesToCsvFile(deFileName, WikiArticle.Language.DE, de, true);
-            serializeListOfMostPopularWikiArticlesToCsvFile(enFileName, WikiArticle.Language.EN, en, true);
-            serializeListOfMostPopularWikiArticlesToCsvFile(esFileName, WikiArticle.Language.ES, es, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
