@@ -88,7 +88,7 @@ public class LeipzigSentencesCorporaReader extends JCasCollectionReader_ImplBase
         List<String> corporaFileNames = new ArrayList<>();
         for (String langCode : corporaLanguages.split(",")) {
             String corporaFileName = null;
-            switch (langCode) {
+            switch (langCode.trim()) {
                 case "DE":
                     if (loadWikiCorpora) {
                         corporaFileName = pathToCorporaRootDirectory + GERMAN_WIKI_SENTENCES_CORPORA_NAME + "/" + GERMAN_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
