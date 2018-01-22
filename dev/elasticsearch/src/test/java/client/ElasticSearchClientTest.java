@@ -7,6 +7,7 @@ import org.junit.*;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ElasticSearchClientTest {
 
@@ -55,6 +56,16 @@ public class ElasticSearchClientTest {
             this.client.indexArticles(articles);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Test
+    @Ignore
+    public void searchTest() throws IOException {
+        List<String> ret = this.client.findArticleTitlesByLanguageCodeAndQuery("de", "Pizza macht freude");
+
+        for (String s : ret) {
+            System.out.println(s);
         }
     }
 

@@ -4,10 +4,15 @@ import data.input.WikiArticle;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.ClusterName;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.search.MultiMatchQuery;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 
 import java.io.IOException;
@@ -69,7 +74,23 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
 
     @Override
     public List<String> findArticleTitlesByLanguageCodeAndQuery(String languageCode, String query) {
-        return null; // todo
+
+        SearchResponse response = client.prepareSearch(languageCode)
+                .setTypes("article")
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .setQuery(QueryBuilders.multiMatchQuery(
+                        query,
+                        "title", "content"
+                ))
+                .setFrom(0).setSize(60).setExplain(true)
+                .get();
+
+        ArrayList<String> ret = new ArrayList<>();
+        for (SearchHit documentFields : response.getHits()) {
+            ret.add(documentFields.getId());
+        }
+
+        return ret;
     }
 
     @Override
