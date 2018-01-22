@@ -82,7 +82,7 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
                         query,
                         "title", "content"
                 ))
-                .setFrom(0).setSize(60).setExplain(true)
+                .setFrom(0).setSize(20).setExplain(true)
                 .get();
 
         ArrayList<String> ret = new ArrayList<>();
