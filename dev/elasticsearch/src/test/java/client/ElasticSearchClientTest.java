@@ -6,6 +6,7 @@ import org.junit.*;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 public class ElasticSearchClientTest {
 
@@ -23,7 +24,7 @@ public class ElasticSearchClientTest {
 
     @Test
     @Ignore
-    public void checkClusterHealthTest() throws IOException {
+    public void indexSingleArticleTest() throws IOException {
 
         String title = "Pizza";
         WikiArticle.Language lang = WikiArticle.Language.DE;
@@ -32,6 +33,29 @@ public class ElasticSearchClientTest {
 
 
         this.client.indexArticle(article);
+    }
+
+    @Test
+    @Ignore
+    public void indexArticlesViaBulkTest() throws IOException {
+
+        WikiArticle.Language lang = WikiArticle.Language.DE;
+        WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
+
+        WikiArticle article = loader.loadArticle("Pizza", lang);
+        WikiArticle article2 = loader.loadArticle("Backofenstein", lang);
+
+        ArrayList<WikiArticle> articles = new ArrayList<WikiArticle>();
+
+        articles.add(article);
+        articles.add(article2);
+
+
+        try {
+            this.client.indexArticles(articles);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

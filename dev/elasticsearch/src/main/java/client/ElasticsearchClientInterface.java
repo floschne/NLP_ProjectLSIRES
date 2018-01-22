@@ -23,6 +23,6 @@ public interface ElasticsearchClientInterface {
     /**
      * @param wikiArticles List of the articles to index
      */
-    void indexArticles(List<WikiArticle> wikiArticles);
+    void indexArticles(List<WikiArticle> wikiArticles) throws Exception;
 
 }

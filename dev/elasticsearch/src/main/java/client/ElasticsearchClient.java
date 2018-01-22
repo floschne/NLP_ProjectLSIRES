@@ -1,6 +1,9 @@
 package client;
 
 import data.input.WikiArticle;
+import org.elasticsearch.action.bulk.BulkItemResponse;
+import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.ClusterName;
 import org.elasticsearch.common.settings.Settings;
@@ -10,6 +13,7 @@ import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -81,6 +85,34 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
     }
 
     @Override
-    public void indexArticles(List<WikiArticle> wikiArticles) {
+    public void indexArticles(List<WikiArticle> wikiArticles) throws Exception {
+
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+
+        for (WikiArticle wikiArticle : wikiArticles) {
+            bulkRequest.add(client.prepareIndex(wikiArticle.getLanguage().toString(), TYPE_NAME, wikiArticle.getArticleId())
+                    .setSource(jsonBuilder()
+                            .startObject()
+                            .field("title", wikiArticle.getTitle())
+                            .field("content", wikiArticle.getContent())
+                            .endObject()
+                    )
+            );
+
+        }
+
+        BulkResponse bulkResponse = bulkRequest.get();
+
+        // check for failures and create wrapper exception
+        if (bulkResponse.hasFailures()) {
+            ArrayList<Exception> exceptionBasket= new ArrayList<Exception>();
+
+            for (BulkItemResponse bulkItemResponse : bulkResponse) {
+                exceptionBasket.add(bulkItemResponse.getFailure().getCause());
+            }
+
+            if(exceptionBasket.size() != 0) throw new BulkIndexingFailedException(exceptionBasket);
+        }
+
     }
 }
