@@ -10,7 +10,10 @@ import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
 
-public class QueryGenerationConsumer extends JCasConsumer_ImplBase {
+/**
+ * Consumer that stores the generated queries (Sentence Annotations) in the QueryStore
+ */
+public class StoreQueriesConsumer extends JCasConsumer_ImplBase {
 
     public static final String PARAM_NUMBER_OF_QUERIES_PER_LANGUAGE = "NumberOfQueriesPerLanguage";
     @ConfigurationParameter(name = PARAM_NUMBER_OF_QUERIES_PER_LANGUAGE, description = "The number of Queries that will be generated per language", mandatory = false, defaultValue = "100")

@@ -22,7 +22,6 @@ public class QueryGenerator {
     private Integer numOfQueries;
     private String languages;
 
-
     public QueryGenerator(Boolean newsQueries, Boolean wikiQueries, Integer numOfQueries, String languages) {
         this.newsQueries = newsQueries;
         this.wikiQueries = wikiQueries;
@@ -41,16 +40,16 @@ public class QueryGenerator {
                 LeipzigSentencesCorporaReader.PARAM_CORPORA_LANGUAGES, languages,
                 LeipzigSentencesCorporaReader.PARAM_LOAD_NEWS_CORPORA, newsQueries,
                 LeipzigSentencesCorporaReader.PARAM_LOAD_WIKI_CORPORA, wikiQueries,
-                LeipzigSentencesCorporaReader.PARAM_PATH_TO_CORPORA_ROOT_DIRECTORY, basePath + "/../../data/leipzigCorpora/");
+                LeipzigSentencesCorporaReader.PARAM_PATH_TO_CORPORA_ROOT_DIRECTORY, basePath + "/data/leipzigCorpora/");
 
-        AnalysisEngine sentenceSeqmenter = AnalysisEngineFactory.createEngine(LineBasedSentenceSegmenter.class);
+        AnalysisEngine sentenceSegmenter = AnalysisEngineFactory.createEngine(LineBasedSentenceSegmenter.class);
 
-        AnalysisEngine queryConsumer = AnalysisEngineFactory.createEngine(QueryGenerationConsumer.class,
-                QueryGenerationConsumer.PARAM_NUMBER_OF_QUERIES_PER_LANGUAGE, numOfQueries);
+        AnalysisEngine queryConsumer = AnalysisEngineFactory.createEngine(StoreQueriesConsumer.class,
+                StoreQueriesConsumer.PARAM_NUMBER_OF_QUERIES_PER_LANGUAGE, numOfQueries);
 
         SimplePipeline.runPipeline(
                 leipzigReader,
-                sentenceSeqmenter,
+                sentenceSegmenter,
                 queryConsumer
         );
     }
