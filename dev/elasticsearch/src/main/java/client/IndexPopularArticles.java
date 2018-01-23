@@ -15,7 +15,7 @@ public class IndexPopularArticles {
     public static void main(String[] args) {
 
         // basic config
-        Integer numberOfPopularArticles = 20;
+        Integer numberOfPopularArticles = 1000;
         List<Pair<Language, String>> wikiArticlesToProcess;
         List<WikiArticle> wikiArticles = new ArrayList<>();
         WikiArticleLoader wikiArticleLoader = WikiHttpApiLoader.getInstance();
@@ -45,9 +45,7 @@ public class IndexPopularArticles {
             startTime = System.currentTimeMillis();
 
 
-            for (Pair<Language, String> article : wikiArticlesToProcess) {
-                wikiArticles.add(wikiArticleLoader.loadArticle(article.getRight(), article.getLeft()));
-            }
+            wikiArticles = wikiArticleLoader.loadArticles(wikiArticlesToProcess);
 
             // profiling
             endTime   = System.currentTimeMillis();
