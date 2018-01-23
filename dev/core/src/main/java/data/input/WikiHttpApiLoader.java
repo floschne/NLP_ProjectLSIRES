@@ -57,7 +57,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @param title the title of the Wikipedia article
      * @return a String representing the Wikipedia API URL of the specified query
      */
-    private String generateApiCallForQuery(WikiArticle.Language l, String title) {
+    private String generateApiCallForQuery(Language l, String title) {
         return WIKI_API_BASE_URL
                 .replace(WIKI_API_BASE_URL_LANGUAGE_TOKEN, l.toString())
                 .replace(WIKI_API_BASE_URL_FORMAT_TOKEN, DEFAULT_FORMAT)
@@ -77,7 +77,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @throws IOException
      */
     // explicit package private scope for testing since using reflection is not really necessary here in my opinion
-    WikiArticle createArticleFromApiResponse(String title, WikiArticle.Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
+    WikiArticle createArticleFromApiResponse(String title, Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         WikiArticle article = new WikiArticle(title, language);
         String articleContent = extractArticleContentFromApiResponse(apiResponse);
         //get contents as list
@@ -138,7 +138,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @throws MissingResourceException if the article was not available
      */
     @Override
-    public WikiArticle loadArticle(String title, WikiArticle.Language language) throws MissingResourceException, IOException {
+    public WikiArticle loadArticle(String title, Language language) throws MissingResourceException, IOException {
         //execute HTTP GET via Apache Fluent HC
         String apiCall = generateApiCallForQuery(language, title);
         String response = Request.Get(apiCall).execute().returnContent().asString();

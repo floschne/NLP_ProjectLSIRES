@@ -4,15 +4,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import data.input.WikiArticle;
+import data.input.Language;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.fluent.Request;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.InputMismatchException;
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility class to get the list of the most popular Wikipedia Articles (based on pageviews)
@@ -34,6 +31,12 @@ public class PopularWikiArticlesListBuilder {
     private static final Integer DEFAULT_MONTH = 12;
     private static final Integer DEFAULT_DAY = 10;
 
+    public enum ListOrdering {
+        ASC,
+        DESC,
+        SHUF;
+    }
+
     /**
      * generates the API Call URL based on the parameters
      *
@@ -43,7 +46,7 @@ public class PopularWikiArticlesListBuilder {
      * @param day   the day from which the ranking for the most popular pages gets loaded
      * @return the API Call URL as a String
      */
-    private static String generateApiCallFromParameters(WikiArticle.Language lang, Integer year, Integer month, Integer day) {
+    private static String generateApiCallFromParameters(Language lang, Integer year, Integer month, Integer day) {
         if (lang == null)
             throw new IllegalArgumentException("Language must not be null!");
         if (year == null)
@@ -75,9 +78,9 @@ public class PopularWikiArticlesListBuilder {
      *
      * @param response the JSON encoded response from the API Call
      * @param limit    the limit of articles that should be loaded
-     * @return the titles of the articles as a list of Strings
+     * @param ordering s     * @return the titles of the articles as a list of Strings
      */
-    private static List<String> filterResponseForArticles(String response, Integer limit) {
+    private static List<String> filterResponseForArticles(String response, Integer limit, ListOrdering ordering) {
         List<String> popularArticles = new ArrayList<>();
 
         JsonElement jElement = new JsonParser().parse(response);
@@ -100,7 +103,18 @@ public class PopularWikiArticlesListBuilder {
             if (popularArticles.size() < limit)
                 popularArticles.add(articleTitle);
             else
-                return popularArticles;
+                break;
+        }
+
+        switch (ordering) {
+            case ASC:
+                break;
+            case DESC:
+                Collections.reverse(popularArticles);
+                break;
+            case SHUF:
+                Collections.shuffle(popularArticles);
+                break;
         }
 
         return popularArticles;
@@ -117,49 +131,23 @@ public class PopularWikiArticlesListBuilder {
      * @return the titles of the most popular Wikipedia Articles as a list of Strings
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day, Integer limit) throws IOException {
+    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
         String apiCall = generateApiCallFromParameters(lang, year, month, day);
         String response = Request.Get(apiCall).execute().returnContent().asString();
 
-        return filterResponseForArticles(response, limit);
+        return filterResponseForArticles(response, limit, ordering);
     }
+
 
     /**
      * Returns the list of titles of the most popular Wikipedia Articles
      *
      * @param lang  the Language of the Wikipedia Articles
-     * @param year  the year
-     * @param month the month
-     * @param day   the day from which the ranking for the most popular pages gets loaded
-     * @return the titles of the most popular Wikipedia Articles as a list of Strings
-     * @throws IOException
-     */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer year, Integer month, Integer day) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, year, month, day, 1000);
-    }
-
-
-    /**
-     * Returns the list of titles of the most popular Wikipedia Articles
-     *
-     * @param lang the Language of the Wikipedia Articles
-     * @throws IOException
-     */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, null, null, null, 1000);
-    }
-
-
-
-    /**
-     * Returns the list of titles of the most popular Wikipedia Articles
-     *
-     * @param lang the Language of the Wikipedia Articles
      * @param limit the limit of articles that should be returned
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(WikiArticle.Language lang, Integer limit) throws IOException {
-        return getListOfMostPopularWikiArticles(lang, null, null, null, limit);
+    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer limit, ListOrdering ordering) throws IOException {
+        return getListOfMostPopularWikiArticles(lang, null, null, null, limit, ordering);
     }
 
     /**
@@ -170,7 +158,7 @@ public class PopularWikiArticlesListBuilder {
      * @param articles         the list of popular Wikipedia Articles
      * @param writeToResources TODO flag to write file to resource folder
      */
-    public static void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, WikiArticle.Language lang, List<String> articles, Boolean writeToResources) {
+    public static void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, Language lang, List<String> articles, Boolean writeToResources) {
         try {
             Writer writer = new FileWriter(new File(fileName));
             /* TODO make it possible to create file in resource folder without hard coding path..
@@ -207,8 +195,8 @@ public class PopularWikiArticlesListBuilder {
      * @return a list of pairs "<lang>,<title>" containing the language and title of the popular article
      * @throws IOException
      */
-    public static List<Pair<WikiArticle.Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
-        List<Pair<WikiArticle.Language, String>> popularArticles = new ArrayList<>();
+    public static List<Pair<Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
+        List<Pair<Language, String>> popularArticles = new ArrayList<>();
         BufferedReader reader;
         String line;
         String[] entry;
@@ -218,32 +206,12 @@ public class PopularWikiArticlesListBuilder {
                 entry = line.split(",");
                 if (entry.length != 2)
                     throw new InputMismatchException("Each entry i.e. line in the file has to be in the format <lang>,<title>");
-                popularArticles.add(Pair.of(WikiArticle.Language.valueOf(entry[0]), entry[1]));
+                popularArticles.add(Pair.of(Language.valueOf(entry[0]), entry[1]));
             }
         }
 
         return popularArticles;
     }
 
-    public static void main(String[] args) {
-        System.out.println("Generating CSV files containing list of the most popular Wikipedia Articles!");
-
-        //ONLY WORKS FOR UNIX SYSTEMS DUE TO PATH IN FILE NAMES!
-        String deFileName = "/tmp/popularWikiArticles_de.csv";
-        String enFileName = "/tmp/popularWikiArticles_en.csv";
-        String esFileName = "/tmp/popularWikiArticles_es.csv";
-
-        try {
-            List<String> de = getListOfMostPopularWikiArticles(WikiArticle.Language.DE);
-            List<String> en = getListOfMostPopularWikiArticles(WikiArticle.Language.EN);
-            List<String> es = getListOfMostPopularWikiArticles(WikiArticle.Language.ES);
-
-            serializeListOfMostPopularWikiArticlesToCsvFile(deFileName, WikiArticle.Language.DE, de, true);
-            serializeListOfMostPopularWikiArticlesToCsvFile(enFileName, WikiArticle.Language.EN, en, true);
-            serializeListOfMostPopularWikiArticlesToCsvFile(esFileName, WikiArticle.Language.ES, es, true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
 
