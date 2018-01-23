@@ -102,7 +102,9 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
      */
     @Override
     public void getNext(JCas jCas) throws IOException, CollectionException {
-        jCas.setDocumentText(wikiArticles.get(currentArticleIdx++).getContentAsString());
+    	WikiArticle currentArticle = wikiArticles.get(currentArticleIdx++);
+    	jCas.setDocumentLanguage(currentArticle.getLanguage().toString());
+        jCas.setDocumentText(currentArticle.getContentAsString());
     }
 
     /**

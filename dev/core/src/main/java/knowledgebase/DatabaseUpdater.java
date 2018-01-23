@@ -9,8 +9,9 @@ import org.apache.uima.fit.component.JCasConsumer_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
 import org.apache.uima.fit.util.JCasUtil;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.util.Level;
 
-import type.*;
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 
 public class DatabaseUpdater extends JCasConsumer_ImplBase {
 	public static final String PARAM_DATABASE = "Database";
@@ -32,13 +33,14 @@ public class DatabaseUpdater extends JCasConsumer_ImplBase {
 
 	@Override
 	public void process(JCas aJCas) throws AnalysisEngineProcessException {
-		String language = ""; // TODO get proper language
+		getContext().getLogger().log(Level.INFO, "Updating database...");
 		try (DatabaseHandler dbHandler = new DatabaseHandler(databaseLocation, databaseUser, databasePassword)) {
 			for (Token t : JCasUtil.select(aJCas, Token.class))
-				dbHandler.updateStatisticsForToken(t.getCoveredText(), Language.valueOf(language.toUpperCase()));
+				dbHandler.updateStatisticsForToken(t.getCoveredText(), Language.valueOf(aJCas.getDocumentLanguage().toUpperCase()));
 		}
 		catch (ClassNotFoundException | SQLException | DatabaseAccessException exc) {
 			throw new AnalysisEngineProcessException(exc.getMessage(), null, exc.getCause());
 		}
+		getContext().getLogger().log(Level.INFO, "Database updated");
 	}
 }

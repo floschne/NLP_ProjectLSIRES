@@ -35,7 +35,7 @@ public class DatabaseTest {
 
 	@Test
 	public void testDatabaseCreation() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {}
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {}
 		catch (ClassNotFoundException exc) {
 			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
 			fail("Unable to find the database package");
@@ -48,7 +48,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testAccessExistingDatabase() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {}
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {}
 		catch (ClassNotFoundException exc) {
 			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
 			fail("Unable to find the database package");
@@ -57,7 +57,7 @@ public class DatabaseTest {
 			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
 			fail("Unable to create tables");
 		}
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {}
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {}
 		catch (ClassNotFoundException exc) {
 			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
 			fail("Unable to find the database package");
@@ -69,8 +69,58 @@ public class DatabaseTest {
 	}
 	
 	@Test
+	public void testEscapeString() {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
+			handler.updateStatisticsForToken("don't", EN);
+			handler.updateStatisticsForToken("Ma'am", EN);
+			handler.updateStatisticsForToken("Ma'am", DE);
+			handler.updateStatisticsForToken("``yes''", EN);
+			
+			System.out.println("Database state after insertion of escaped tokens");
+			handler.printLanguageFrequencyTable();
+			System.out.println();
+			handler.printTokenFrequencyPerLanguageTable();
+			System.out.println();
+			System.out.println("====================");
+			System.out.println();
+			
+			assertEquals(0.25, handler.tokenLikelihood("don't"), DELTA);
+			assertEquals(0.25, handler.tokenLikelihood("don\'t"), DELTA);
+			assertEquals(0.5, handler.tokenLikelihood("Ma'am"), DELTA);
+			assertEquals(0.5, handler.tokenLikelihood("Ma\'am"), DELTA);
+			assertEquals(0.25, handler.tokenLikelihood("``yes''"), DELTA);
+			assertEquals(0.25, handler.tokenLikelihood("``yes\'\'"), DELTA);
+			assertEquals(0, handler.tokenLikelihood("dont''t"), DELTA);
+			assertEquals(0, handler.tokenLikelihood("dont"), DELTA);
+			assertEquals(0, handler.tokenLikelihood("don\\'t"), DELTA);
+			assertEquals(0, handler.tokenLikelihood("``yes\\''"), DELTA);
+			assertEquals(0.75, handler.languageLikelihood(EN), DELTA);
+			assertEquals(0.25, handler.languageLikelihood(DE), DELTA);
+			assertEquals(0, handler.languageLikelihood(ES), DELTA);
+			assertEquals(1, handler.languageLikelihoodGivenToken("don't", EN), DELTA);
+			assertEquals(0.5, handler.languageLikelihoodGivenToken("Ma'am", EN), DELTA);
+			assertEquals(0.5, handler.languageLikelihoodGivenToken("Ma'am", DE), DELTA);
+			assertEquals(1, handler.languageLikelihoodGivenToken("``yes''", EN), DELTA);
+			assertEquals(1. / 3, handler.tokenLikelihoodGivenLanguage("don't", EN), DELTA);
+			assertEquals(1. / 3, handler.tokenLikelihoodGivenLanguage("Ma'am", EN), DELTA);
+			assertEquals(1, handler.tokenLikelihoodGivenLanguage("Ma'am", DE), DELTA);
+			assertEquals(1. / 3, handler.tokenLikelihoodGivenLanguage("``yes''", EN), DELTA);
+		} catch (ClassNotFoundException exc) {
+			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
+			fail("Unable to find the database package");
+		} catch (SQLException | DatabaseAccessException exc) {
+			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
+			fail("Unable to manage database");
+		}
+		catch (DatabaseModelException exc) {
+			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
+			fail("Database model corrupted");
+		}
+	}
+	
+	@Test
 	public void testDatabaseUpdate() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			System.out.println("Database state before insertion:");
 			handler.printLanguageFrequencyTable();
 			System.out.println();
@@ -106,7 +156,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testTotalNumberOfTokens() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			handler.updateStatisticsForToken("hello", EN);
 			handler.updateStatisticsForToken("in", EN);
 			handler.updateStatisticsForToken("in", DE);
@@ -127,7 +177,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testTokenPriors() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			handler.updateStatisticsForToken("hello", EN);
 			handler.updateStatisticsForToken("in", EN);
 			handler.updateStatisticsForToken("in", DE);
@@ -163,7 +213,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testLanguagePriors() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			handler.updateStatisticsForToken("hello", EN);
 			handler.updateStatisticsForToken("in", EN);
 			handler.updateStatisticsForToken("in", DE);
@@ -187,7 +237,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testTokenPosteriors() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			handler.updateStatisticsForToken("hello", EN);
 			handler.updateStatisticsForToken("in", EN);
 			handler.updateStatisticsForToken("in", DE);
@@ -250,7 +300,7 @@ public class DatabaseTest {
 	
 	@Test
 	public void testLanguagePosteriors() {
-		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DATABASE_USER, DatabaseHandler.DATABASE_PASSWORD);) {
+		try (DatabaseHandler handler = new DatabaseHandler(DATABASE_LOCATION, DatabaseHandler.DEFAULT_USER, DatabaseHandler.DEFAULT_PASSWORD);) {
 			handler.updateStatisticsForToken("hello", EN);
 			handler.updateStatisticsForToken("in", EN);
 			handler.updateStatisticsForToken("in", DE);
@@ -305,5 +355,10 @@ public class DatabaseTest {
 			System.err.println(exc.getClass().getSimpleName() + ": " + exc.getMessage());
 			fail("Unable to manage database");
 		}
+	}
+	
+	@Test
+	public void testLanguageDetection() {
+		// TODO
 	}
 }

@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class WikiArticle {
 
-    public static final String WIKI_ARTICLE_INTRO_HEADING = "= Introduction =\n";
+	public static final String WIKI_ARTICLE_INTRO_HEADING = "";
 
     private String title;
     private Language language;

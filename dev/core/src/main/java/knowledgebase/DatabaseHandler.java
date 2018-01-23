@@ -17,9 +17,9 @@ import data.input.Language;
 public class DatabaseHandler implements AutoCloseable {
 	// Default database location
 	public static final String DEFAULT_LOCATION = "./res/main/data/database";
-	// Database access data
-	public static final String DATABASE_USER = "auto";
-	public static final String DATABASE_PASSWORD = "";
+	// Default database access data
+	public static final String DEFAULT_USER = "auto";
+	public static final String DEFAULT_PASSWORD = "";
 	// Database table names
 	private static final String TABLE_LANGFREQ = "languageFrequency";
 	private static final String TABLE_TOKENFREQ = "tokenFrequencyPerLanguage";
@@ -89,20 +89,20 @@ public class DatabaseHandler implements AutoCloseable {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
 		try (Statement stm = con.createStatement();
-				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + token + "');")) {
+				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + escapeString(token) + "');")) {
 			if (rs.next()) // If there is a record
-				stm.executeUpdate("UPDATE " + TABLE_TOKENFREQ + " SET " + language.toString() + " = " + language.toString() + " + 1 WHERE " + COLUMN_TOKENFREQ_TOKEN + " = '" + token + "';"); // Being the primary key, the token can be assumed to be unique
+				stm.executeUpdate("UPDATE " + TABLE_TOKENFREQ + " SET " + language.toString() + " = " + language.toString() + " + 1 WHERE " + COLUMN_TOKENFREQ_TOKEN + " = '" + escapeString(token) + "';"); // Being the primary key, the token can be assumed to be unique
 			else {
 				StringBuffer s = new StringBuffer("INSERT INTO " + TABLE_TOKENFREQ + " (" + COLUMN_TOKENFREQ_TOKEN);
 				for (Language l : Language.values())
 					s.append(", " + l.toString());
-				s.append(") VALUES ('" + token + "'");
+				s.append(") VALUES ('" + escapeString(token) + "'");
 				for (Language l : Language.values()) // The values() method of the Enum type returns an array with a consistent order for each call
 					s.append(", " + (l.equals(language) ? 1 : 0));
 				s.append(");");
 				stm.executeUpdate(s.toString());
 			}
-			stm.executeUpdate("UPDATE " + TABLE_LANGFREQ + " SET " + COLUMN_LANGFREQ_COUNT + " = " + COLUMN_LANGFREQ_COUNT + " + 1 WHERE " + COLUMN_LANGFREQ_LANGUAGE + " = '" + language.toString() + "';");
+			stm.executeUpdate("UPDATE " + TABLE_LANGFREQ + " SET " + COLUMN_LANGFREQ_COUNT + " = " + COLUMN_LANGFREQ_COUNT + " + 1 WHERE " + COLUMN_LANGFREQ_LANGUAGE + " = '" + escapeString(language.toString()) + "';");
 		}
 	}
 	
@@ -136,7 +136,7 @@ public class DatabaseHandler implements AutoCloseable {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
 		try (Statement stm = con.createStatement();
-				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + token + "');");) {
+				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + escapeString(token) + "');");) {
 			double tokenFrequency = 0;
 			if (rs.next())
 				for (Language l : Language.values())
@@ -157,7 +157,7 @@ public class DatabaseHandler implements AutoCloseable {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
 		try (Statement stm = con.createStatement();
-				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_LANGFREQ + " WHERE (" + COLUMN_LANGFREQ_LANGUAGE + " = '" + language.toString() + "');");) {
+				ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_LANGFREQ + " WHERE (" + COLUMN_LANGFREQ_LANGUAGE + " = '" + escapeString(language.toString()) + "');");) {
 			double languageFrequency = 0;
 			if (rs.next())
 				languageFrequency = rs.getInt(COLUMN_LANGFREQ_COUNT);
@@ -180,11 +180,11 @@ public class DatabaseHandler implements AutoCloseable {
 			throw new DatabaseAccessException("Database already closed");
 		try (Statement stm = con.createStatement()) {
 			double tokenFrequencyGivenLanguage = 0;
-			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + token + "');")) {
+			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + escapeString(token) + "');")) {
 				if (rs.next()) // If there is a record
 					tokenFrequencyGivenLanguage = rs.getInt(language.toString());
 			}
-			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_LANGFREQ + " WHERE (" + COLUMN_LANGFREQ_LANGUAGE + " = '" + language.toString() + "');")) {
+			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_LANGFREQ + " WHERE (" + COLUMN_LANGFREQ_LANGUAGE + " = '" + escapeString(language.toString()) + "');")) {
 				if (rs.next())
 					return tokenFrequencyGivenLanguage / rs.getInt(COLUMN_LANGFREQ_COUNT);
 				else // Database corrupted
@@ -208,7 +208,7 @@ public class DatabaseHandler implements AutoCloseable {
 		if (isClosed())
 			throw new DatabaseAccessException("Database already closed");
 		try (Statement stm = con.createStatement()) {
-			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + token + "');")) {
+			try (ResultSet rs = stm.executeQuery("SELECT * FROM " + TABLE_TOKENFREQ + " WHERE (" + COLUMN_TOKENFREQ_TOKEN + " = '" + escapeString(token) + "');")) {
 				if (rs.next()) { // If there is a record
 					double tokenAndLanguageFrequency = rs.getInt(language.toString());
 					int tokenFrequency = 0;
@@ -254,6 +254,15 @@ public class DatabaseHandler implements AutoCloseable {
 				System.out.println(s.toString());
 			}
 		}
+	}
+	
+	/**
+	 * Escapes the specified {@code String} according to the conventions of SQL in order to use it in SQL statements.
+	 * @param s the {@code String} to escape
+	 * @return the specified {@code String}, escaped according to the conventions of SQL
+	 */
+	public static String escapeString(String s) {
+		return s.replaceAll("'", "''");
 	}
 	
 	/**
