@@ -1,8 +1,12 @@
 package client;
 
+import data.input.Language;
 import data.input.WikiArticle;
 import data.input.WikiHttpApiLoader;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -28,7 +32,7 @@ public class ElasticSearchClientTest {
     public void indexSingleArticleTest() throws IOException {
 
         String title = "Pizza";
-        WikiArticle.Language lang = WikiArticle.Language.DE;
+        Language lang = Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
         WikiArticle article = loader.loadArticle(title, lang);
 
@@ -40,7 +44,7 @@ public class ElasticSearchClientTest {
     @Ignore
     public void indexArticlesViaBulkTest() throws IOException {
 
-        WikiArticle.Language lang = WikiArticle.Language.DE;
+        Language lang = Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
 
         WikiArticle article = loader.loadArticle("Pizza", lang);
