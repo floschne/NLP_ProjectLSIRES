@@ -1,0 +1,290 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Elasticsearch Local",
+		"_postman_id": "40c58e17-eea5-b275-f87c-f1fc85b97333",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/",
+			"request": {
+				"url": "http://localhost:9200",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get all indexes",
+			"request": {
+				"url": "http://localhost:9200/_cat/indices?v",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "create index: de",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9200/de?pretty",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"de"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": "",
+							"equals": false,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "create index: en",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9200/en?pretty",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"en"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": "",
+							"equals": false,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "create index: es",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9200/en?pretty",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"en"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": "",
+							"equals": false,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "file",
+					"file": {
+						"src": ""
+					}
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "delete index",
+			"request": {
+				"url": {
+					"raw": "http://localhost:9200/{{language}}?pretty",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"{{language}}"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": "",
+							"equals": false,
+							"description": ""
+						}
+					],
+					"variable": []
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "delete specific index",
+			"request": {
+				"url": "http://localhost:9200/",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get mapping",
+			"request": {
+				"url": "http://localhost:9200/{{language}}/_mapping",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get all mappings",
+			"request": {
+				"url": "http://localhost:9200/_mapping",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "get settings",
+			"request": {
+				"url": "http://localhost:9200/{{language}}/_settings",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "analyze standard",
+			"request": {
+				"url": "http://localhost:9200/{{language}}/_analyze",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"analyzer\": \"german\",\n  \"text\":      \"Hier ein Beispiel: Die Bezeichnung Bodensee steht für zwei Seen und einen sie verbindenden Flussabschnitt des Rheins, nämlich den Obersee (auch alleine Bodensee genannt), den Seerhein und den Untersee. Der Bodensee liegt im Bodenseebecken, das Teil des nördlichen Alpenvorlandes ist, und wird vom Rhein durchflossen. Dieser Artikel behandelt neben dem Bodensee selbst auch die umgebende Bodenseeregion, die sich je nach räumlicher Definition weit ins Hinterland erstreckt. Drei Staaten haben Anteil an Bodensee und Bodenseeregion: Deutschland, Österreich und die Schweiz. Während es im Untersee eine anerkannte Grenzziehung zwischen Deutschland und der Schweiz gibt, wurde von den Anrainerstaaten des Obersees nie einvernehmlich eine Grenze festgelegt.\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "analyze standard custom",
+			"request": {
+				"url": "http://localhost:9200/{{language}}/_analyze",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"tokenizer\": \"standard\",\n  \"filter\":  [\n            \"lowercase\",\n            \"german_stop\",\n            \"german_keywords\",\n            \"german_normalization\",\n            \"german_stemmer\"\n          ],\n  \"text\":      \"(=== 18. Jahrhundert === \\n Die nur mit Olivenöl beträufelte\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "match all",
+			"request": {
+				"url": "http://localhost:9200/de/_search",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"match_all\": {}\n    }\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
