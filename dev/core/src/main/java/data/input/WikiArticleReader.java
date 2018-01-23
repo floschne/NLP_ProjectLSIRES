@@ -3,6 +3,7 @@ package data.input;
 import data.util.PopularWikiArticlesListBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UimaContext;
+import org.apache.uima.cas.CAS;
 import org.apache.uima.collection.CollectionException;
 import org.apache.uima.fit.component.JCasCollectionReader_ImplBase;
 import org.apache.uima.fit.descriptor.ConfigurationParameter;
@@ -39,7 +40,7 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
     //will contain the articles that are already loaded
     private List<WikiArticle> wikiArticles;
     //List of tuples of title and language of the articles that should be added to the JCAS (aka processed by the reader)
-    private List<Pair<WikiArticle.Language, String>> wikiArticlesToProcess;
+    private List<Pair<Language, String>> wikiArticlesToProcess;
 
     private Integer currentArticleIdx;
 
@@ -67,22 +68,22 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
                 if (numberOfPopularArticles == null || numberOfPopularArticles > 1000)
                     numberOfPopularArticles = 1000;
                 // get popular article titles of german, english and spanish wikipedia articles
-                List<String> popularArticleTitlesDe = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.DE, numberOfPopularArticles);
-                List<String> popularArticleTitlesEn = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.EN, numberOfPopularArticles);
-                List<String> popularArticleTitlesEs = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(WikiArticle.Language.ES, numberOfPopularArticles);
+                List<String> popularArticleTitlesDe = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.DE, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+                List<String> popularArticleTitlesEn = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.EN, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+                List<String> popularArticleTitlesEs = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.ES, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
                 wikiArticlesToProcess = new ArrayList<>();
                 for (String title : popularArticleTitlesDe)
-                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.DE, title));
+                    wikiArticlesToProcess.add(Pair.of(Language.DE, title));
                 for (String title : popularArticleTitlesEn)
-                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.EN, title));
+                    wikiArticlesToProcess.add(Pair.of(Language.EN, title));
                 for (String title : popularArticleTitlesEs)
-                    wikiArticlesToProcess.add(Pair.of(WikiArticle.Language.ES, title));
+                    wikiArticlesToProcess.add(Pair.of(Language.ES, title));
             }
 
 
             // download the articles and save them in the wikiArticles list
             logger.log(Level.INFO, "Starting to download the Wikipedia Articles!");
-            for (Pair<WikiArticle.Language, String> article : wikiArticlesToProcess) {
+            for (Pair<Language, String> article : wikiArticlesToProcess) {
                 logger.log(Level.INFO, "Downloading Wikipedia Articles with title '" + article.getRight() + "'...");
                 wikiArticles.add(wikiArticleLoader.loadArticle(article.getRight(), article.getLeft()));
             }

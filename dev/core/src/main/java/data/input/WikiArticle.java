@@ -9,23 +9,6 @@ import java.util.*;
  */
 public class WikiArticle {
 
-    public enum Language {
-        EN("en"),
-        DE("de"),
-        ES("es");
-
-        private final String languageCode;
-
-        Language(final String languageCode) {
-            this.languageCode = languageCode;
-        }
-
-        @Override
-        public String toString() {
-            return languageCode;
-        }
-    }
-
     public static final String WIKI_ARTICLE_INTRO_HEADING = "= Introduction =\n";
 
     private String title;

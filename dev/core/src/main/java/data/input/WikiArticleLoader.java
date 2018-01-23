@@ -2,7 +2,6 @@ package data.input;
 
 import java.io.IOException;
 import java.util.MissingResourceException;
-import java.util.Set;
 
 public interface WikiArticleLoader {
     /**
@@ -12,6 +11,6 @@ public interface WikiArticleLoader {
      * @return a @{@link WikiArticle}
      * @throws MissingResourceException if the article was not available
      */
-    WikiArticle loadArticle(String title, WikiArticle.Language language) throws MissingResourceException, IOException;
+    WikiArticle loadArticle(String title, Language language) throws MissingResourceException, IOException;
 }
 

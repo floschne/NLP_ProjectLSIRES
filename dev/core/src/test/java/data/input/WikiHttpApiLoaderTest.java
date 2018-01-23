@@ -109,7 +109,7 @@ public class WikiHttpApiLoaderTest {
     @Test
     public void addApiResponseAsContentToArticleTest() {
         String title = "Pizza";
-        WikiArticle.Language lang = WikiArticle.Language.DE;
+        Language lang = Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
         try {
             WikiArticle article = loader.createArticleFromApiResponse(title, lang, STATIC_PIZZA_RESPONSE);
@@ -131,7 +131,7 @@ public class WikiHttpApiLoaderTest {
     @Test
     public void loadArticleTest() throws IOException {
         String title = "Pizza";
-        WikiArticle.Language lang = WikiArticle.Language.DE;
+        Language lang = Language.DE;
         WikiHttpApiLoader loader = WikiHttpApiLoader.getInstance();
         WikiArticle article = loader.loadArticle(title, lang);
         Assert.assertNotNull(article);
