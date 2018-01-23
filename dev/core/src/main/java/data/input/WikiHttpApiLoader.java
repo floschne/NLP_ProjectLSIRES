@@ -1,5 +1,6 @@
 package data.input;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.client.fluent.Request;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -13,6 +14,7 @@ import javax.xml.xpath.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,6 +28,51 @@ import java.util.regex.Pattern;
  */
 public class WikiHttpApiLoader implements WikiArticleLoader {
 
+    // 'high number' of threads since it's not a big deal firing http requests
+    private static final Integer MAX_PARALLEL_THREADS = Runtime.getRuntime().availableProcessors() * 4;
+
+    /**
+     * Agent to load a single @{@link WikiArticle}. Implemented for parallel loading of multiple articles
+     */
+    private class ArticleLoaderAgent implements Callable<WikiArticle> {
+
+        private Language language;
+        private String title;
+        private static final boolean VERBOSE = false;
+
+        public ArticleLoaderAgent(Language lang, String t) {
+            if (lang == null || t == null || t.isEmpty())
+                throw new IllegalArgumentException("Language and Title of the WikiArticle that should be loaded must not be null or empty!");
+            this.language = lang;
+            this.title = t;
+        }
+
+        /**
+         * Computes a result, or throws an exception if unable to do so.
+         *
+         * @return computed result
+         * @throws Exception if unable to compute a result
+         */
+        @Override
+        public WikiArticle call() throws Exception {
+            if(VERBOSE)
+                System.out.println("Downloading WikiArticle '" + title + "' in from '" + language + "'.wikipedia.org");
+            //execute HTTP GET via Apache Fluent HC
+            String apiCall = generateApiCallForQuery(this.language, this.title);
+            String response = Request.Get(apiCall).execute().returnContent().asString();
+
+
+            try {
+                if(VERBOSE)
+                    System.out.println("Finished downloading WikiArticle '" + title + "' in from '" + language + "'.wikipedia.org");
+                return createArticleFromApiResponse(this.title, this.language, response);
+            } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
     private static final String WIKI_API_BASE_URL_LANGUAGE_TOKEN = "<lang>";
     private static final String WIKI_API_BASE_URL_TITLE_TOKEN = "<title>";
     private static final String WIKI_API_BASE_URL_FORMAT_TOKEN = "<format>";
@@ -34,7 +81,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
             ".wikipedia.org/w/api.php?action=query&prop=extracts&explaintext" +
             "&format=" + WIKI_API_BASE_URL_FORMAT_TOKEN +
             "&titles=" + WIKI_API_BASE_URL_TITLE_TOKEN;
-    private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,4} [.\\w\\s]+ ={2,4}";
+    private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,6} [.\\w\\s]+ ={2,6}";
     private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
 
     //TODO think of alternative content to return (such as categories of article etc)
@@ -70,7 +117,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * @param title       the title of the @{@link WikiArticle}
      * @param language    the language of  @{@link WikiArticle}
      * @param apiResponse the XML formatted response from the API call
-     * @return the resulting @{@link WikiArticle}
+     * @return the resulting @{@link WikiArticle} or null if the article doesn't contain any content or is not available
      * @throws SAXException
      * @throws ParserConfigurationException
      * @throws XPathExpressionException
@@ -80,6 +127,8 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
     WikiArticle createArticleFromApiResponse(String title, Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
         WikiArticle article = new WikiArticle(title, language);
         String articleContent = extractArticleContentFromApiResponse(apiResponse);
+        if (articleContent == null)
+            return null;
         //get contents as list
         List<String> contents = Arrays.asList(articleContent.split(API_RESPONSE_HEADING_REGEX_PATTERN));
 
@@ -107,7 +156,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      * Extracts the textual content from the XML formatted API response via XPath
      *
      * @param apiResponse the API response in XML format
-     * @return the textual content from the XML formatted API response via XPath
+     * @return the textual content from the XML formatted API response via XPath or null of there is no content in the article
      * @throws IOException
      * @throws SAXException
      * @throws ParserConfigurationException
@@ -126,6 +175,8 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
         NodeList nodes = (NodeList) expression.evaluate(document, XPathConstants.NODESET);
         assert (nodes.getLength() == 1);
 
+        if (nodes.item(0) == null)
+            return null;
         return nodes.item(0).getTextContent();
     }
 
@@ -134,8 +185,8 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      *
      * @param title    the title of the article
      * @param language the language of the article
-     * @return a @{@link WikiArticle}
-     * @throws MissingResourceException if the article was not available
+     * @return a @{@link WikiArticle}  or null if the article doesn't contain any content or is not available
+     * @throws IOException if there was any error while fetching the article
      */
     @Override
     public WikiArticle loadArticle(String title, Language language) throws MissingResourceException, IOException {
@@ -145,10 +196,43 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
 
 
         try {
-            return createArticleFromApiResponse(title, language, response);
-        } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
+            return new ArticleLoaderAgent(language, title).call();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Downloads the Wikipedia Articles in the articlesToLoad list in parallel
+     *
+     * @param articlesToLoad List of tuples of title and language of the articles that should be loaded
+     * @return a list of articles
+     * @throws ExecutionException
+     * @throws InterruptedException
+     */
+    @Override
+    public List<WikiArticle> loadArticles(List<Pair<Language, String>> articlesToLoad) throws ExecutionException, InterruptedException {
+        // create a managed thread pool with fixed size
+        ExecutorService pool = Executors.newFixedThreadPool(MAX_PARALLEL_THREADS);
+
+        Set<Future<WikiArticle>> articleFutures = new HashSet<>();
+        // for each article in the list of articles that should be downloaded, create a new ArticleLoaderAgent and submit it to the thread pool
+        for (Pair<Language, String> article : articlesToLoad) {
+            // thread pool will create a future that'll be added to the futures set
+            Future<WikiArticle> articleFuture = pool.submit(new ArticleLoaderAgent(article.getLeft(), article.getRight()));
+            articleFutures.add(articleFuture);
+        }
+
+        // get the results from the futures
+        List<WikiArticle> loadedArticles = Collections.synchronizedList(new ArrayList<>());
+        for (Future<WikiArticle> future : articleFutures) {
+            WikiArticle article = future.get();
+            if (article == null)
+                continue;
+            loadedArticles.add(article);
+        }
+
+        return loadedArticles;
     }
 }
