@@ -13,7 +13,9 @@ import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
 import org.apache.uima.jcas.JCas;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static knowledgebase.DatabaseUpdater.*;
 import static knowledgebase.DatabaseHandler.DEFAULT_LOCATION;
@@ -38,7 +40,16 @@ public class DatabaseUpdatePipeline {
 	 * @throws IOException if there is an I/O probelm while reading from the web
 	 */
 	public static void main(String[] args) throws UIMAException, IOException {
-		runUpdatePipeline(DEFAULT_LOCATION, DEFAULT_USER, DEFAULT_PASSWORD, 10); // XXX Only loads <= 100 for debugging and testing
+
+        System.out.println("Number of Wikipedia Articles to load per language: [1, 1000]");
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        Integer numArticlesPerLanguage = Integer.valueOf(br.readLine());
+        if (numArticlesPerLanguage > 1000)
+            numArticlesPerLanguage = 1000;
+        if (numArticlesPerLanguage < 1)
+            numArticlesPerLanguage = 1;
+
+		runUpdatePipeline(DEFAULT_LOCATION, DEFAULT_USER, DEFAULT_PASSWORD, numArticlesPerLanguage); // XXX Only loads <= 100 for debugging and testing
 	}
 	
 	/**
