@@ -2,7 +2,6 @@ package query_generation;
 
 import data.input.Language;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.analysis_component.AnalysisComponent;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
 import org.apache.uima.fit.component.JCasConsumer_ImplBase;
@@ -33,7 +32,7 @@ public class StoreQueriesConsumer extends JCasConsumer_ImplBase {
     public void process(JCas jCas) throws AnalysisEngineProcessException {
         Language lang = Language.valueOf(jCas.getDocumentLanguage().toUpperCase());
         for (Sentence s : JCasUtil.select(jCas, Sentence.class)) {
-            queryStore.addQuery(Pair.of(lang, s.getCoveredText()));
+            queryStore.addQuery(new Query(lang, s.getCoveredText()));
             if (queryStore.getQueryListOfLanguage(lang).size() == numberOfQueriesPerLanguage)
                 break;
         }

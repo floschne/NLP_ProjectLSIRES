@@ -1,10 +1,11 @@
 package query_generation;
 
 import data.input.Language;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Singleton Query Store for global access to queries that are generated.
@@ -20,38 +21,31 @@ public class QueryStore {
     }
 
     private QueryStore() {
-        //initialize the query lists in the specified languages
-        queries = new ArrayList<>();
+        queries = new HashMap<>();
     }
 
-    // list of queries in all languages as a list of pairs of a language to the list of queries in that specific language
-    private List<Pair<Language, List<String>>> queries;
+    // queries in all languages as a map from a language to the list of queries in that specific language
+    private Map<Language, List<Query>> queries;
 
     /**
      * Adds a query of a specific {@link Language} to the repo.
      *
      * @param query the query as a Pair from the language of the query to query string
      */
-    public void addQuery(Pair<Language, String> query) {
-        boolean addedQuery = false;
-        for (Pair<Language, List<String>> p : queries) {
-            if (p.getLeft().equals(query.getLeft())) {
-                p.getRight().add(query.getRight());
-                addedQuery = true;
-                break;
-            }
-        }
-        if (!addedQuery) {
-            queries.add(Pair.of(query.getLeft(), new ArrayList<>()));
-            addQuery(query);
-        }
+    public void addQuery(Query query) {
+        // add a new array list if there is no list of queries for that language
+        queries.computeIfAbsent(query.getLanguage(), k -> new ArrayList<>());
+        queries.get(query.getLanguage()).add(query);
     }
 
     /**
-     * @return Returns list of queries in all languages as a list of pairs of a language to the list of queries in that specific language
+     * Returns the list containing the queries of all languages
      */
-    public List<Pair<Language, List<String>>> getQueriesOfAllLanguages() {
-        return queries;
+    public List<Query> getQueriesOfAllLanguages() {
+        List<Query> allLanguages = new ArrayList<>();
+        for (List<Query> queryList : queries.values())
+            allLanguages.addAll(queryList);
+        return allLanguages;
     }
 
     /**
@@ -60,11 +54,8 @@ public class QueryStore {
      * @param lang the language of the queries that'll be returned
      * @return the list containing the queries of the specified language or null if there are no queries of the language
      */
-    public List<String> getQueryListOfLanguage(Language lang) {
-        for (Pair<Language, List<String>> p : queries)
-            if (p.getLeft().equals(lang))
-                return p.getRight();
-        return null;
+    public List<Query> getQueryListOfLanguage(Language lang) {
+        return queries.get(lang);
     }
 
 
@@ -72,7 +63,7 @@ public class QueryStore {
      * Resets the store. This deletes all the generated Queries!
      */
     public void reset() {
-        queries = new ArrayList<>();
+        queries = new HashMap<>();
         System.gc();
     }
 }

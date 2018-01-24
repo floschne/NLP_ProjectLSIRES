@@ -1,6 +1,7 @@
 package eval.util;
 
 import data.input.Language;
+import query_generation.Query;
 
 import java.util.Random;
 
@@ -16,7 +17,7 @@ public class DummyLanguageDetector {
         random = new Random();
     }
 
-    public Language detectLanguageOfQuery(String query) {
+    public Language detectLanguageOfQuery(Query query) {
         switch (random.nextInt(3)) {
             case 0:
                 return Language.DE;
