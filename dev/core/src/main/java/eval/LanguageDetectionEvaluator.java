@@ -1,7 +1,6 @@
 package eval;
 
 import data.input.Language;
-import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Token;
 import edu.stanford.nlp.util.ConfusionMatrix;
 import language_detection.type.QueryLanguageAnnotation;
 import org.apache.uima.UimaContext;
@@ -13,10 +12,8 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Level;
 import org.apache.uima.util.Logger;
-import query_generation.Query;
 
 public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
-
     private Logger logger = null;
     private Integer numOfProcessedQueries;
 
@@ -60,7 +57,6 @@ public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
 
         Language gold = Language.valueOf(aJCas.getDocumentLanguage().toUpperCase());
         Language detected = null;
-
         for (QueryLanguageAnnotation qla : JCasUtil.select(aJCas, QueryLanguageAnnotation.class)) {
             detected = Language.valueOf(qla.getLanguageCode().toUpperCase());
             this.confusionMatrix.add(detected, gold);
@@ -78,7 +74,7 @@ public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
 
         StringBuilder sb = new StringBuilder();
         sb.append("\n").append("####### Results of Evaluation #######").append("\n");
-        sb.append("Number of processed Queries: " + numOfProcessedQueries);
+        sb.append("Number of processed Queries: " + numOfProcessedQueries).append("\n");
         sb.append("Confusion Matrix with Scores: ").append("\n");
         sb.append(this.confusionMatrix.printTable());
 

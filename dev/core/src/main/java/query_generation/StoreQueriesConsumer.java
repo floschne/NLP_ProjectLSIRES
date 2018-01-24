@@ -32,9 +32,13 @@ public class StoreQueriesConsumer extends JCasConsumer_ImplBase {
     public void process(JCas jCas) throws AnalysisEngineProcessException {
         Language lang = Language.valueOf(jCas.getDocumentLanguage().toUpperCase());
         for (Sentence s : JCasUtil.select(jCas, Sentence.class)) {
-            queryStore.addQuery(new Query(lang, s.getCoveredText()));
-            if (queryStore.getQueryListOfLanguage(lang).size() == numberOfQueriesPerLanguage)
-                break;
+            if(queryStore.getQueryListOfLanguage(lang) == null)
+                queryStore.addQuery(new Query(lang, s.getCoveredText()));
+            else {
+                if (queryStore.getQueryListOfLanguage(lang).size() >= numberOfQueriesPerLanguage)
+                    break;
+                queryStore.addQuery(new Query(lang, s.getCoveredText()));
+            }
         }
     }
 }
