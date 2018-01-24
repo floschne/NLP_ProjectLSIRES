@@ -1,6 +1,7 @@
 package client;
 
 import data.input.WikiArticle;
+import org.apache.commons.lang3.tuple.Pair;
 import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -73,7 +74,7 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
     }
 
     @Override
-    public List<String> findArticleTitlesByLanguageCodeAndQuery(String languageCode, String query) {
+    public List<Pair<String, Float>> findArticleTitlesByLanguageCodeAndQuery(String languageCode, String query) {
 
         SearchResponse response = client.prepareSearch(languageCode)
                 .setTypes("article")
@@ -85,9 +86,9 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
                 .setFrom(0).setSize(20).setExplain(true)
                 .get();
 
-        ArrayList<String> ret = new ArrayList<>();
+        List<Pair<String, Float>> ret = new ArrayList<>();
         for (SearchHit documentFields : response.getHits()) {
-            ret.add(documentFields.getId());
+            ret.add(Pair.of(documentFields.getId(), documentFields.getScore()));
         }
 
         return ret;
