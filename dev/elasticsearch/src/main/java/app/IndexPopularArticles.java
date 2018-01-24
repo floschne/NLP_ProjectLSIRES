@@ -1,11 +1,10 @@
 package app;
 
 import client.ElasticsearchClient;
-import data.input.Language;
-import data.input.WikiArticle;
-import data.input.WikiArticleLoader;
+import data.input.*;
+import data.input.IWikiArticleLoader;
 import data.input.WikiHttpApiLoader;
-import data.util.PopularWikiArticlesListBuilder;
+import data.util.PopularWikiArticleTitlesBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class IndexPopularArticles {
         Integer numberOfPopularArticles = 1000;
         List<Pair<Language, String>> wikiArticlesToProcess;
         List<WikiArticle> wikiArticles = new ArrayList<>();
-        WikiArticleLoader wikiArticleLoader = WikiHttpApiLoader.getInstance();
+        IWikiArticleLoader IWikiArticleLoader = WikiHttpApiLoader.getInstance();
 
         // profiling
         System.out.println("Starting to index " + numberOfPopularArticles*3 + " wikipedia articles");
@@ -27,9 +26,9 @@ public class IndexPopularArticles {
 
         try {
 
-            List<String> popularArticleTitlesDe = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.DE, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.DESC);
-            List<String> popularArticleTitlesEn = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.EN, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.DESC);
-            List<String> popularArticleTitlesEs = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.ES, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.DESC);
+            List<String> popularArticleTitlesDe = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.DE, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.DESC);
+            List<String> popularArticleTitlesEn = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.EN, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.DESC);
+            List<String> popularArticleTitlesEs = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.ES, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.DESC);
 
             wikiArticlesToProcess = new ArrayList<>();
             for (String title : popularArticleTitlesDe)
@@ -46,7 +45,7 @@ public class IndexPopularArticles {
             startTime = System.currentTimeMillis();
 
 
-            wikiArticles = wikiArticleLoader.loadArticles(wikiArticlesToProcess);
+            wikiArticles = IWikiArticleLoader.loadArticles(wikiArticlesToProcess);
 
             // profiling
             endTime   = System.currentTimeMillis();

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * <p>
  * Example API call: https://de.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext&format=xml&titles=Pizza
  */
-public class WikiHttpApiLoader implements WikiArticleLoader {
+public class WikiHttpApiLoader implements IWikiArticleLoader {
 
     // 'high number' of threads since it's not a big deal firing http requests
     private static final Integer MAX_PARALLEL_THREADS = Runtime.getRuntime().availableProcessors() * 4;

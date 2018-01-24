@@ -1,8 +1,8 @@
 package client;
 
+import data.input.WikiHttpApiLoader;
 import data.input.Language;
 import data.input.WikiArticle;
-import data.input.WikiHttpApiLoader;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Before;

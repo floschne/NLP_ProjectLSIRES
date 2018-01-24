@@ -1,7 +1,6 @@
 package knowledgebase;
 
-import data.input.WikiArticleReader;
-import util.uima.AnnotationWriter;
+import data.input.PopularWikiArticlesReader;
 
 import de.tudarmstadt.ukp.dkpro.core.tokit.RegexTokenizer;
 import org.apache.uima.UIMAException;
@@ -9,9 +8,7 @@ import org.apache.uima.analysis_engine.AnalysisEngine;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
-import org.apache.uima.fit.factory.JCasFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
-import org.apache.uima.jcas.JCas;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,7 +60,7 @@ public class DatabaseUpdatePipeline {
 //		JCas jcas = JCasFactory.createJCas();
 //		jcas.setDocumentLanguage("en");
 //		jcas.setDocumentText("foo bar qoox");
-		CollectionReader wikiReader = CollectionReaderFactory.createReader(WikiArticleReader.class, WikiArticleReader.PARAM_NUMBER_OF_POPULAR_ARTICLES, numberOfArticles);
+		CollectionReader wikiReader = CollectionReaderFactory.createReader(PopularWikiArticlesReader.class, PopularWikiArticlesReader.PARAM_NUMBER_OF_POPULAR_ARTICLES, numberOfArticles);
 		AnalysisEngine tokenizer = AnalysisEngineFactory.createEngine(RegexTokenizer.class, RegexTokenizer.PARAM_WRITE_SENTENCE, false, RegexTokenizer.PARAM_TOKEN_BOUNDARY_REGEX, TOKEN_BOUNDARY_REGEX);
 		AnalysisEngine databaseUpdater = AnalysisEngineFactory.createEngine(DatabaseUpdater.class, PARAM_DATABASE, databaseLocation, PARAM_USER, databaseUser, PARAM_PASSWORD, databasePassword);
 //		AnalysisEngine writer = AnalysisEngineFactory.createEngine(AnnotationWriter.class);

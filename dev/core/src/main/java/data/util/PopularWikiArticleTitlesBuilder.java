@@ -15,7 +15,19 @@ import java.util.*;
  * Utility class to get the list of the most popular Wikipedia Articles (based on pageviews)
  * See https://wikimedia.org/api/rest_v1/#!/Pageviews_data/get_metrics_pageviews_top_project_access_year_month_day for more detailed info
  */
-public class PopularWikiArticlesListBuilder {
+public class PopularWikiArticleTitlesBuilder {
+
+    private PopularWikiArticleTitlesBuilder() {
+
+    }
+
+    private static PopularWikiArticleTitlesBuilder singleton;
+
+    public static PopularWikiArticleTitlesBuilder getInstance() {
+        if(singleton == null)
+            singleton = new PopularWikiArticleTitlesBuilder();
+        return singleton;
+    }
 
     private static final String API_URL = "https://wikimedia.org/api/rest_v1/metrics/pageviews/top/<lang>.wikipedia.org/all-access/<year>/<month>/<day>";
     private static final String API_URL_LANG_TOKEN = "<lang>";
@@ -46,7 +58,7 @@ public class PopularWikiArticlesListBuilder {
      * @param day   the day from which the ranking for the most popular pages gets loaded
      * @return the API Call URL as a String
      */
-    private static String generateApiCallFromParameters(Language lang, Integer year, Integer month, Integer day) {
+    private String generateApiCallFromParameters(Language lang, Integer year, Integer month, Integer day) {
         if (lang == null)
             throw new IllegalArgumentException("Language must not be null!");
         if (year == null)
@@ -80,7 +92,7 @@ public class PopularWikiArticlesListBuilder {
      * @param limit    the limit of articles that should be loaded
      * @param ordering s     * @return the titles of the articles as a list of Strings
      */
-    private static List<String> filterResponseForArticles(String response, Integer limit, ListOrdering ordering) {
+    private List<String> filterResponseForArticles(String response, Integer limit, ListOrdering ordering) {
         List<String> popularArticles = new ArrayList<>();
 
         JsonElement jElement = new JsonParser().parse(response);
@@ -131,7 +143,7 @@ public class PopularWikiArticlesListBuilder {
      * @return the titles of the most popular Wikipedia Articles as a list of Strings
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
+    public List<String> getListOfMostPopularWikiArticles(Language lang, Integer year, Integer month, Integer day, Integer limit, ListOrdering ordering) throws IOException {
         String apiCall = generateApiCallFromParameters(lang, year, month, day);
         String response = Request.Get(apiCall).execute().returnContent().asString();
 
@@ -146,7 +158,7 @@ public class PopularWikiArticlesListBuilder {
      * @param limit the limit of articles that should be returned
      * @throws IOException
      */
-    public static List<String> getListOfMostPopularWikiArticles(Language lang, Integer limit, ListOrdering ordering) throws IOException {
+    public List<String> getListOfMostPopularWikiArticles(Language lang, Integer limit, ListOrdering ordering) throws IOException {
         return getListOfMostPopularWikiArticles(lang, null, null, null, limit, ordering);
     }
 
@@ -158,12 +170,12 @@ public class PopularWikiArticlesListBuilder {
      * @param articles         the list of popular Wikipedia Articles
      * @param writeToResources TODO flag to write file to resource folder
      */
-    public static void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, Language lang, List<String> articles, Boolean writeToResources) {
+    public void serializeListOfMostPopularWikiArticlesToCsvFile(String fileName, Language lang, List<String> articles, Boolean writeToResources) {
         try {
             Writer writer = new FileWriter(new File(fileName));
             /* TODO make it possible to create file in resource folder without hard coding path..
             if(writeToResources) {
-                writer = new PrintWriter(new File(PopularWikiArticlesListBuilder.class.getResource(fileName).getPath()));
+                writer = new PrintWriter(new File(PopularWikiArticleTitlesBuilder.class.getResource(fileName).getPath()));
             }
             else {
                 writer = new FileWriter(new File(fileName));
@@ -195,7 +207,7 @@ public class PopularWikiArticlesListBuilder {
      * @return a list of pairs "<lang>,<title>" containing the language and title of the popular article
      * @throws IOException
      */
-    public static List<Pair<Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
+    public List<Pair<Language, String>> deserializeListOfMostPopularWikiArticlesFromCsvFile(String... fileNames) throws IOException {
         List<Pair<Language, String>> popularArticles = new ArrayList<>();
         BufferedReader reader;
         String line;
