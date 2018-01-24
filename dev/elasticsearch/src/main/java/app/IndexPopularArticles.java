@@ -1,5 +1,6 @@
-package client;
+package app;
 
+import client.ElasticsearchClient;
 import data.input.Language;
 import data.input.WikiArticle;
 import data.input.WikiArticleLoader;
@@ -61,7 +62,6 @@ public class IndexPopularArticles {
             endTime   = System.currentTimeMillis();
             totalTime = endTime - startTime;
             System.out.println("\t -> articles indexes in: " + totalTime/1000 + "s \t (" + (numberOfPopularArticles*3)/(totalTime/1000) + " articles/s)");
-            startTime = System.currentTimeMillis();
 
 
         } catch (Exception e) {
