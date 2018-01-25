@@ -1,21 +1,103 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml">
-<title>LSIRES - Results</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css"/>
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-colors-flat.css"/>
+
+<head>
+    <title>LSIRES - Results</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css"/>
+
+    <!-- Styles -->
+    <style>
+            html, body {
+                background-color: #fff;
+                color: #636b6f;
+                font-family: 'Raleway', sans-serif;
+                font-weight: 100;
+                height: 100vh;
+                margin: 0;
+            }
+
+            samp {
+                font-size: 80%;
+                color: #6c757d!important;
+            }
+
+            .content {
+                text-align: center;
+            }
+
+            .title {
+                font-size: 72px;
+            }
+
+            .links > a {
+                color: #636b6f;
+                padding: 0 25px;
+                font-size: 12px;
+                font-weight: 600;
+                letter-spacing: .1rem;
+                text-decoration: none;
+                text-transform: uppercase;
+            }
+
+            .m-b-md {
+                margin-bottom: 30px;
+            }
+        </style>
+
+
+</head>
 <body>
 
-<div class="w3-container w3-center">
-    <div class="w3-card-4">
-        <div class="w3-container w3-green">
-            <h2>Welcome to LSIRES: Results</h2>
+<div class="container" style="margin-top: 5rem;">
+    <div class="row justify-content-md-center">
+        <div class="col-12 col-md-auto">
+            <h1 class="title m-b-md">LSIRES: Results</h1>
         </div>
-
-        <h3>Query: </h3>
-        <h3 th:text="${LSIRESQuery.value}"/>
     </div>
+
+    <div class="row justify-content-md-center" style="margin-top: 2rem; margin-bottom: 2rem;">
+        <form class="form-inline" action="#" th:action="@{/}" th:object="${query}" method="post">
+
+            <input type="text" style="width: 350px;" class="form-control mb-2 mr-sm-2 mb-sm-0" id="inlineFormInput" placeholder="Query..." th:field="${LSIRESQuery.value}"/>
+
+            <button type="submit" class="btn btn-primary">Search</button>
+
+        </form>
+    </div>
+
+    <div class="row justify-content-md-center">
+        <div class="col-12">
+            <h2>Language: <span style="margin-left: 2rem;" class="badge badge-default">DE</span></h2>
+        </div>
+    </div>
+
+    <hr/>
+
+    <div class="row justify-content-md-center">
+        <div class="col-12">
+            <div class="card">
+                <h3 class="card-header">Backofen <span class="badge badge-danger">2,3</span></h3>
+
+                <div class="card-block">
+                    <p class="card-text">
+                        <a href="https://de.wikipedia.org/wiki/Backofen">https://de.wikipedia.org/wiki/Backofen</a>
+                        <hr/>
+                        <samp>
+                            Ein Backofen ist ein elektrisch- oder brennstoffbeheizter Apparat zum Backen, Braten und Grillen von Lebensmitteln. Er findet Einsatz im Haushalt, im Handwerk sowie im industriellen Bereich. In Teilen Deutschlands und Österreichs wird der Backofen Backrohr, auch Backröhre oder nur Rohr genannt
+                        </samp>
+                    </p>
+                    <a href="#" class="btn btn-primary pull-right"> visit! </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 </div>
 
 </body>

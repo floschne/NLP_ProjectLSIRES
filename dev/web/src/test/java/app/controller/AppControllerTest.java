@@ -33,7 +33,7 @@ public class AppControllerTest {
     @Test
     public void submitsForm() throws Exception {
         mockMvc.perform(post(RouteConfiguration.RESULTS_MAPPING_ROUTE).param("value", queryValue))
-                .andExpect(content().string(containsString("Welcome to LSIRES: Results")))
+                .andExpect(content().string(containsString("LSIRES: Results")))
                 .andExpect(content().string(containsString(queryValue)));
     }
 }
