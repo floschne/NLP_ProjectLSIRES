@@ -9,7 +9,6 @@ import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.fit.factory.CollectionReaderFactory;
 import org.apache.uima.fit.pipeline.SimplePipeline;
-import org.apache.uima.resource.ResourceInitializationException;
 import query_generation.QueryGenerator;
 
 import java.io.BufferedReader;
@@ -22,17 +21,17 @@ import static language_detection.LanguageDetector.*;
 public class LanguageDetectionEvaluationPipeline {
 
     public static void runPipeline() throws UIMAException, IOException {
-        System.out.println("Generate queries from Wikipedia Articles Datasource (0, 1)?");
+        System.out.println("Generate queries from Wikipedia Articles Datasource (n, y)?");
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        Boolean wiki = br.readLine().equals("1");
+        Boolean wiki = br.readLine().equals("y");
 
-        System.out.println("Generate queries from News Articles Datasource (0, 1)?");
+        System.out.println("Generate queries from News Articles Datasource (n, y)?");
         br = new BufferedReader(new InputStreamReader(System.in));
-        Boolean news = br.readLine().equals("1");
+        Boolean news = br.readLine().equals("y");
 
-        System.out.println("Use DummyLanguageDetector (0, 1)?");
+        System.out.println("Use Dummy Language Detector to detect a language randomly instead of actual Language Detection Algorithm? (n, y)");
         br = new BufferedReader(new InputStreamReader(System.in));
-        Boolean dummy = br.readLine().equals("1");
+        Boolean dummy = br.readLine().equals("y");
 
         System.out.println("Number of Queries per Language [1, 60000]?");
         br = new BufferedReader(new InputStreamReader(System.in));

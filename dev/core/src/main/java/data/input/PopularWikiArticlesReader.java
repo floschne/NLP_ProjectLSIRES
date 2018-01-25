@@ -36,8 +36,8 @@ public class PopularWikiArticlesReader extends JCasCollectionReader_ImplBase {
 
     private Logger logger = null;
 
-    //the IWikiArticleLoader that'll be used to provide the articles
-    private IWikiArticleLoader IWikiArticleLoader;
+    //the wikiArticleLoader that'll be used to provide the articles
+    private IWikiArticleLoader wikiArticleLoader;
     //will contain the articles that are already loaded
     private List<WikiArticle> wikiArticles;
     //List of tuples of title and language of the articles that should be added to the JCAS (aka processed by the reader)
@@ -55,7 +55,7 @@ public class PopularWikiArticlesReader extends JCasCollectionReader_ImplBase {
     public void initialize(UimaContext context) throws ResourceInitializationException {
         super.initialize(context);
         logger = context.getLogger();
-        this.IWikiArticleLoader = WikiHttpApiLoader.getInstance();
+        this.wikiArticleLoader = WikiHttpApiLoader.getInstance();
         wikiArticles = new ArrayList<>();
         currentArticleIdx = 0;
 
@@ -86,7 +86,7 @@ public class PopularWikiArticlesReader extends JCasCollectionReader_ImplBase {
 
             // download the articles and save them in the wikiArticles list
             logger.log(Level.INFO, "Starting to download " + wikiArticlesToProcess.size() + " Wikipedia Articles!");
-            wikiArticles = IWikiArticleLoader.loadArticles(wikiArticlesToProcess);
+            wikiArticles = wikiArticleLoader.loadArticles(wikiArticlesToProcess);
             logger.log(Level.INFO, "Finished downloading the Wikipedia Articles!");
         } catch (IOException | ExecutionException | InterruptedException e) {
             e.printStackTrace();

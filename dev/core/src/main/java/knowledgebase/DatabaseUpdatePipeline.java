@@ -57,19 +57,13 @@ public class DatabaseUpdatePipeline {
 	 */
 	// Intentionally package private
 	static void runUpdatePipeline(String databaseLocation, String databaseUser, String databasePassword, int numberOfArticles) throws UIMAException, IOException {
-//		JCas jcas = JCasFactory.createJCas();
-//		jcas.setDocumentLanguage("en");
-//		jcas.setDocumentText("foo bar qoox");
 		CollectionReader wikiReader = CollectionReaderFactory.createReader(PopularWikiArticlesReader.class, PopularWikiArticlesReader.PARAM_NUMBER_OF_POPULAR_ARTICLES, numberOfArticles);
 		AnalysisEngine tokenizer = AnalysisEngineFactory.createEngine(RegexTokenizer.class, RegexTokenizer.PARAM_WRITE_SENTENCE, false, RegexTokenizer.PARAM_TOKEN_BOUNDARY_REGEX, TOKEN_BOUNDARY_REGEX);
 		AnalysisEngine databaseUpdater = AnalysisEngineFactory.createEngine(DatabaseUpdater.class, PARAM_DATABASE, databaseLocation, PARAM_USER, databaseUser, PARAM_PASSWORD, databasePassword);
-//		AnalysisEngine writer = AnalysisEngineFactory.createEngine(AnnotationWriter.class);
 		SimplePipeline.runPipeline(
-//				jcas,
 				wikiReader,
 				tokenizer,
-				databaseUpdater/*,
-				writer*/
+				databaseUpdater
 		);
 	}
 }

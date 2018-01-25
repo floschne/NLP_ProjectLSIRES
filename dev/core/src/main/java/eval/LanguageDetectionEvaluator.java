@@ -17,8 +17,8 @@ public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
     private Logger logger = null;
     private Integer numOfProcessedQueries;
 
-    private class AmbiguosLanguageAnnotationsException extends Exception {
-        AmbiguosLanguageAnnotationsException() {
+    private class AmbiguousLanguageAnnotationsException extends Exception {
+        AmbiguousLanguageAnnotationsException() {
             super("Ambiguous Languages for Query!");
         }
     }
@@ -53,7 +53,7 @@ public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
             throw new AnalysisEngineProcessException(new NoGoldLanguageSetException());
 
         if (JCasUtil.select(aJCas, QueryLanguageAnnotation.class).size() != 1)
-            throw new AnalysisEngineProcessException(new AmbiguosLanguageAnnotationsException());
+            throw new AnalysisEngineProcessException(new AmbiguousLanguageAnnotationsException());
 
         Language gold = Language.valueOf(aJCas.getDocumentLanguage().toUpperCase());
         Language detected = null;
