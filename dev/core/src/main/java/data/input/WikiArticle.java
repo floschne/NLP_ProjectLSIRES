@@ -13,6 +13,7 @@ public class WikiArticle {
 
     private String title;
     private Language language;
+    private String url;
     //List of pairs <heading, content> representing the sections of an article
     private List<Pair<String, String>> content;
 
@@ -25,6 +26,13 @@ public class WikiArticle {
         this.title = t;
         this.language = l;
         this.content = new ArrayList<>();
+    }
+
+    public WikiArticle(String t, Language l, String url) {
+        this(t, l);
+        if (url == null || url.isEmpty())
+            throw new IllegalArgumentException("URL of a Wikipedia Article must not be null or empty!");
+        this.url = url;
     }
 
     public void addContent(String heading, String content) {
@@ -77,4 +85,23 @@ public class WikiArticle {
     public String getArticleId() {
         return language.toString() + ";" + title;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public static String getTitleFromId(String id) {
+        if (id == null || id.isEmpty() || !id.contains(";")) {
+            throw new IllegalArgumentException("Given String doesn't seem to be an ID of an WikiArticle!");
+        }
+        return id.split(";")[1];
+    }
+
+    public static String getLanguageFromId(String id) {
+        if (id == null || id.isEmpty() || !id.contains(";")) {
+            throw new IllegalArgumentException("Given String doesn't seem to be an ID of an WikiArticle!");
+        }
+        return id.split(";")[0];
+    }
+
 }

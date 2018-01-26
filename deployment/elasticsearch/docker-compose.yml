@@ -50,7 +50,7 @@ services:
   kopf:
     image: lmenezes/elasticsearch-kopf
     ports:
-      - 8080:80
+      - 8888:80
     environment:
       - KOPF_SERVER_NAME=eskopf
       - KOPF_ES_SERVERS=172.21.0.2:9200

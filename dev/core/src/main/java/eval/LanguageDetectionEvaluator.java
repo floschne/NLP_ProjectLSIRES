@@ -17,8 +17,8 @@ public class LanguageDetectionEvaluator extends JCasConsumer_ImplBase {
     private Logger logger = null;
     private Integer numOfProcessedQueries;
 
-    private class AmbiguousLanguageAnnotationsException extends Exception {
-        AmbiguousLanguageAnnotationsException() {
+    public static class AmbiguousLanguageAnnotationsException extends Exception {
+        public AmbiguousLanguageAnnotationsException() {
             super("Ambiguous Languages for Query!");
         }
     }

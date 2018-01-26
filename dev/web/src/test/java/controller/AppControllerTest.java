@@ -1,4 +1,4 @@
-package app.controller;
+package controller;
 
 import controller.RouteConfiguration;
 import org.junit.Test;

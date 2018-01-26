@@ -25,7 +25,7 @@ import java.util.List;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
-public class ElasticsearchClient implements ElasticsearchClientInterface{
+public class ElasticsearchClient implements ElasticsearchClientInterface {
 
     // default config
     private static final String CLUSTER_NAME =  "docker-cluster";
@@ -58,7 +58,7 @@ public class ElasticsearchClient implements ElasticsearchClientInterface{
     private void init(List<String> serverAddresses, int transportTCPPort, String clusterName) throws UnknownHostException {
         Settings settings = Settings.builder()
                 .put("client.transport.sniff", false)
-                .put(ClusterName.CLUSTER_NAME_SETTING.getKey(), clusterName)
+                .put("cluster.name", clusterName)
                 .build()
                 ;
 
