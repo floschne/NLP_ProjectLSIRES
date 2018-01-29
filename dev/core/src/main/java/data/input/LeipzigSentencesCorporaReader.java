@@ -31,15 +31,13 @@ public class LeipzigSentencesCorporaReader extends JCasCollectionReader_ImplBase
     private static final String SPANISH_NEWS_SENTENCES_CORPORA_NAME = "spa_newscrawl_2015_10K";
 
     private static final String ENGLISH_WIKI_SENTENCES_CORPORA_NAME = "eng_wikipedia_2016_10K";
-    private static final String ENGLISH_NEWS_SENTENCES_CORPORA_NAME = "eng_news_2015_10k";
+    private static final String ENGLISH_NEWS_SENTENCES_CORPORA_NAME = "eng_news_2015_10K";
 
     private static final String SENTENCES_CORPORA_SUFFIX = "-sentences.txt";
 
-    private Logger logger = null;
+    private static final String RELATIVE_PATH_TO_CORPORA_ROOT_DIRECTORY = "/NLP_ProjectLSIRES/data/leipzigCorpora/";
 
-    public static final String PARAM_PATH_TO_CORPORA_ROOT_DIRECTORY = "PathToCorporaRootDirectory";
-    @ConfigurationParameter(name = PARAM_PATH_TO_CORPORA_ROOT_DIRECTORY, description = "The path to the root directory where the corpora files are located", mandatory = true)
-    private String pathToCorporaRootDirectory;
+    private Logger logger = null;
 
     public static final String PARAM_LOAD_NEWS_CORPORA = "LoadNewsCorpora";
     @ConfigurationParameter(name = PARAM_LOAD_NEWS_CORPORA, description = "Boolean flag. If true News corpora should be loaded and false if not.")
@@ -56,6 +54,10 @@ public class LeipzigSentencesCorporaReader extends JCasCollectionReader_ImplBase
     private List<String> sentencesCorporaFilesNames;
     private Integer currentSentencesCorporaIdx;
 
+    private String getPathToCorporaRootDirectory() {
+        String path = new File("").getAbsolutePath() + RELATIVE_PATH_TO_CORPORA_ROOT_DIRECTORY;
+        return path.replaceAll("NLP_ProjectLSIRES(.*)\\/data\\/leipzigCorpora", RELATIVE_PATH_TO_CORPORA_ROOT_DIRECTORY);
+    }
 
     /**
      * This method should be overwritten by subclasses.
@@ -69,8 +71,8 @@ public class LeipzigSentencesCorporaReader extends JCasCollectionReader_ImplBase
 
         if (!loadWikiCorpora && !loadNewsCorpora)
             throw new IllegalArgumentException("Either PARAM_LOAD_NEWS_CORPORA, PARAM_LOAD_WIKI_CORPORA or both must be true!");
-        if (!Files.isDirectory(Paths.get(pathToCorporaRootDirectory)))
-            throw new IllegalArgumentException("Path ('" + pathToCorporaRootDirectory + "') to the root directory of the corpora doesn't exist!");
+        if (!Files.isDirectory(Paths.get(getPathToCorporaRootDirectory())))
+            throw new IllegalArgumentException("Path ('" + getPathToCorporaRootDirectory() + "') to the root directory of the corpora doesn't exist!");
 
         logger = context.getLogger();
 
@@ -86,41 +88,42 @@ public class LeipzigSentencesCorporaReader extends JCasCollectionReader_ImplBase
 
     private List<String> generateCorporaFileNames(Boolean loadNewsCorpora, Boolean loadWikiCorpora) {
         List<String> corporaFileNames = new ArrayList<>();
+        String corporaFileName = null;
+        String rootPath = getPathToCorporaRootDirectory();
         for (String langCode : corporaLanguages.split(",")) {
-            String corporaFileName = null;
-            switch (langCode.trim()) {
+            switch (langCode.trim().toUpperCase()) {
                 case "DE":
                     if (loadWikiCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + GERMAN_WIKI_SENTENCES_CORPORA_NAME + "/" + GERMAN_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + GERMAN_WIKI_SENTENCES_CORPORA_NAME + "/" + GERMAN_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     if (loadNewsCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + GERMAN_NEWS_SENTENCES_CORPORA_NAME + "/" + GERMAN_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + GERMAN_NEWS_SENTENCES_CORPORA_NAME + "/" + GERMAN_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     break;
                 case "EN":
                     if (loadWikiCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + ENGLISH_WIKI_SENTENCES_CORPORA_NAME + "/" + ENGLISH_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + ENGLISH_WIKI_SENTENCES_CORPORA_NAME + "/" + ENGLISH_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     if (loadNewsCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + ENGLISH_NEWS_SENTENCES_CORPORA_NAME + "/" + ENGLISH_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + ENGLISH_NEWS_SENTENCES_CORPORA_NAME + "/" + ENGLISH_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     break;
                 case "ES":
                     if (loadWikiCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + SPANISH_WIKI_SENTENCES_CORPORA_NAME + "/" + SPANISH_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + SPANISH_WIKI_SENTENCES_CORPORA_NAME + "/" + SPANISH_WIKI_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     if (loadNewsCorpora) {
-                        corporaFileName = pathToCorporaRootDirectory + SPANISH_NEWS_SENTENCES_CORPORA_NAME + "/" + SPANISH_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
+                        corporaFileName = rootPath + SPANISH_NEWS_SENTENCES_CORPORA_NAME + "/" + SPANISH_NEWS_SENTENCES_CORPORA_NAME + SENTENCES_CORPORA_SUFFIX;
                         corporaFileNames.add(corporaFileName);
                     }
                     break;
                 default:
-                    throw new IllegalArgumentException("Language Code '" + langCode + "' is not supported! Supported: {EN, DE, ES}");
+                    throw new IllegalArgumentException("Language Code '" + langCode.trim().toUpperCase() + "' is not supported! Supported: {EN, DE, ES}");
             }
         }
         return corporaFileNames;

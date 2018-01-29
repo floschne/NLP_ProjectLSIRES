@@ -18,8 +18,8 @@ public class QueryGenerationTest {
         QueryGenerator queryGenerator = new QueryGenerator(news, wiki, numQueries, language);
         queryGenerator.generateQueries();
 
-        Assert.assertNotNull(queryGenerator.getQueryListOfLanguage(Language.DE));
-        Assert.assertEquals(queryGenerator.getQueryListOfLanguage(Language.DE).size(), numQueries);
+        Assert.assertNotNull(queryGenerator.getQueriesListOfLanguage(Language.DE));
+        Assert.assertEquals(queryGenerator.getQueriesListOfLanguage(Language.DE).size(), numQueries);
 
         news = true;
         wiki = false;
@@ -27,8 +27,8 @@ public class QueryGenerationTest {
         queryGenerator = new QueryGenerator(news, wiki, numQueries, language);
         queryGenerator.generateQueries();
 
-        Assert.assertNotNull(queryGenerator.getQueryListOfLanguage(Language.DE));
-        Assert.assertEquals(queryGenerator.getQueryListOfLanguage(Language.DE).size(), numQueries);
+        Assert.assertNotNull(queryGenerator.getQueriesListOfLanguage(Language.DE));
+        Assert.assertEquals(queryGenerator.getQueriesListOfLanguage(Language.DE).size(), numQueries);
 
     }
 
@@ -41,14 +41,14 @@ public class QueryGenerationTest {
         QueryGenerator queryGenerator = new QueryGenerator(news, wiki, numQueries, language);
         queryGenerator.generateQueries();
 
-        Assert.assertNotNull(queryGenerator.getQueryListOfLanguage(Language.DE));
-        Assert.assertEquals(queryGenerator.getQueryListOfLanguage(Language.DE).size(), numQueries);
+        Assert.assertNotNull(queryGenerator.getQueriesListOfLanguage(Language.DE));
+        Assert.assertEquals(queryGenerator.getQueriesListOfLanguage(Language.DE).size(), numQueries);
 
-        Assert.assertNotNull(queryGenerator.getQueryListOfLanguage(Language.EN));
-        Assert.assertEquals(queryGenerator.getQueryListOfLanguage(Language.EN).size(), numQueries);
+        Assert.assertNotNull(queryGenerator.getQueriesListOfLanguage(Language.EN));
+        Assert.assertEquals(queryGenerator.getQueriesListOfLanguage(Language.EN).size(), numQueries);
 
-        Assert.assertNotNull(queryGenerator.getQueryListOfLanguage(Language.ES));
-        Assert.assertEquals(queryGenerator.getQueryListOfLanguage(Language.ES).size(), numQueries);
+        Assert.assertNotNull(queryGenerator.getQueriesListOfLanguage(Language.ES));
+        Assert.assertEquals(queryGenerator.getQueriesListOfLanguage(Language.ES).size(), numQueries);
     }
 
 

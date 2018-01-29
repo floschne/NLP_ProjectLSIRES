@@ -7,5 +7,21 @@ This is students M.Sc. project on NLP lecture from University of Hamburg
 ## Basic Idea
 The basic idea is to detect the language of a query and get query results of ElasticSearch only in the detected language.
 
+## How To Run the Webinterface
+* Start ElasticSearch Docker Container
+    * ```cd deployment/elasticsearch/ && docker-compose up -d && cd ../../```
+    * Wait until init is finished ~1min
+* Create indices for ElasticSearch
+    * ```deployment/elasticsearch/create_index.sh localhost 9200 de```
+    * ```deployment/elasticsearch/create_index.sh localhost 9200 en```
+    * ```deployment/elasticsearch/create_index.sh localhost 9200 es```
+* Build the Application
+    * ```cd dev/ && mvn clean verify package && cd ..```
+* Create the Knowledge Datatbase to initialize Language Detection
+    * Run the 'DatabaseUpdatePipeline' (best via IntelliJ)
+* Run ```cd dev/web/ && mvn spring-boot:run```
 
+* Open [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
+## Testing
+Run ```cd dev/ && mvn clean verify && cd ..```

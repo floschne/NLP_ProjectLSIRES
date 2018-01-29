@@ -1,7 +1,5 @@
 package data.input;
 
-import data.util.PopularWikiArticlesListBuilder;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXException;
@@ -9,9 +7,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class WikiHttpApiLoaderTest {
 

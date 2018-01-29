@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * <p>
  * Example API call: https://de.wikipedia.org/w/api.php?action=query&prop=extracts&explaintext&format=xml&titles=Pizza
  */
-public class WikiHttpApiLoader implements WikiArticleLoader {
+public class WikiHttpApiLoader implements IWikiArticleLoader {
 
     // 'high number' of threads since it's not a big deal firing http requests
     private static final Integer MAX_PARALLEL_THREADS = Runtime.getRuntime().availableProcessors() * 4;
@@ -55,7 +55,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
          */
         @Override
         public WikiArticle call() throws Exception {
-            if(VERBOSE)
+            if (VERBOSE)
                 System.out.println("Downloading WikiArticle '" + title + "' in from '" + language + "'.wikipedia.org");
             //execute HTTP GET via Apache Fluent HC
             String apiCall = generateApiCallForQuery(this.language, this.title);
@@ -63,7 +63,7 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
 
 
             try {
-                if(VERBOSE)
+                if (VERBOSE)
                     System.out.println("Finished downloading WikiArticle '" + title + "' in from '" + language + "'.wikipedia.org");
                 return createArticleFromApiResponse(this.title, this.language, response);
             } catch (SAXException | ParserConfigurationException | XPathExpressionException e) {
@@ -81,6 +81,11 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
             ".wikipedia.org/w/api.php?action=query&prop=extracts&explaintext" +
             "&format=" + WIKI_API_BASE_URL_FORMAT_TOKEN +
             "&titles=" + WIKI_API_BASE_URL_TITLE_TOKEN;
+
+
+    private static final String WIKI_ARTICLE_BASE_URL = "https://" + WIKI_API_BASE_URL_LANGUAGE_TOKEN +
+            ".wikipedia.org/wiki/" + WIKI_API_BASE_URL_TITLE_TOKEN;
+
     private static final String API_RESPONSE_HEADING_REGEX_PATTERN = "={2,6} [.\\w\\s]+ ={2,6}";
     private static final String API_RESPONSE_ARTICLE_CONTENT_XPATH = "/api/query/pages/page/extract/text()";
 
@@ -125,7 +130,9 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
      */
     // explicit package private scope for testing since using reflection is not really necessary here in my opinion
     WikiArticle createArticleFromApiResponse(String title, Language language, String apiResponse) throws SAXException, ParserConfigurationException, XPathExpressionException, IOException {
-        WikiArticle article = new WikiArticle(title, language);
+        String articleUrl = this.getUrlOfArticleByTitleAndLanguage(title, language);
+        WikiArticle article = new WikiArticle(title, language, articleUrl);
+
         String articleContent = extractArticleContentFromApiResponse(apiResponse);
         if (articleContent == null)
             return null;
@@ -234,5 +241,9 @@ public class WikiHttpApiLoader implements WikiArticleLoader {
         }
 
         return loadedArticles;
+    }
+
+    public String getUrlOfArticleByTitleAndLanguage(String title, Language lang) {
+        return WIKI_ARTICLE_BASE_URL.replaceAll(WIKI_API_BASE_URL_TITLE_TOKEN, title).replaceAll(WIKI_API_BASE_URL_LANGUAGE_TOKEN, lang.toString().toLowerCase());
     }
 }

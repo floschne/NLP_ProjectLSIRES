@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.concurrent.ExecutionException;
 
-public interface WikiArticleLoader {
+public interface IWikiArticleLoader {
     /**
      * Downloads the article from Wikipedia with title @title in the language @language and returns it as a @{@link WikiArticle}
      * @param title the title of the article

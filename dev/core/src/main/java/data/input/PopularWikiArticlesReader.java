@@ -1,6 +1,6 @@
 package data.input;
 
-import data.util.PopularWikiArticlesListBuilder;
+import data.util.PopularWikiArticleTitlesBuilder;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.uima.UimaContext;
 import org.apache.uima.cas.CAS;
@@ -20,24 +20,24 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Reads @{@link WikiArticle}s and adds it to the JCas
+ * Reads the most popular Wikipedia Articles and adds them one by one to the JCas
  */
-public class WikiArticleReader extends JCasCollectionReader_ImplBase {
+public class PopularWikiArticlesReader extends JCasCollectionReader_ImplBase {
     public static final String PARAM_ARTICLE_TITLE_FILES = "ListOfArticlesFile";
     @ConfigurationParameter(name = PARAM_ARTICLE_TITLE_FILES, description = "A comma-separated list of files containing a list of titles of Wikipedia Articles that get processed in this reader", mandatory = false, defaultValue = "utf-8")
     private String listOfArticleTitleFiles;
 
 
     public static final String PARAM_NUMBER_OF_POPULAR_ARTICLES = "NumberOfPopularArticles";
-    @ConfigurationParameter(name = PARAM_NUMBER_OF_POPULAR_ARTICLES, description = "The number of popular Wikipedia Articles that should be processed by the WikiArticleReader", mandatory = false)
+    @ConfigurationParameter(name = PARAM_NUMBER_OF_POPULAR_ARTICLES, description = "The number of popular Wikipedia Articles that should be processed by the PopularWikiArticlesReader", mandatory = false)
     private Integer numberOfPopularArticles;
 
     private static final Boolean useFilesOfArticles = false;
 
     private Logger logger = null;
 
-    //the WikiArticleLoader that'll be used to provide the articles
-    private WikiArticleLoader wikiArticleLoader;
+    //the wikiArticleLoader that'll be used to provide the articles
+    private IWikiArticleLoader wikiArticleLoader;
     //will contain the articles that are already loaded
     private List<WikiArticle> wikiArticles;
     //List of tuples of title and language of the articles that should be added to the JCAS (aka processed by the reader)
@@ -65,15 +65,15 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
                 // deserialize the Wikipedia Article Files and initialize wikiArticlesToProcess
                 String[] titleFiles = listOfArticleTitleFiles.split(",");
                 logger.log(Level.INFO, "Deserializing Wikipedia Article Titles from files: '" + listOfArticleTitleFiles.replace(",", " ") + "' !");
-                wikiArticlesToProcess = PopularWikiArticlesListBuilder.deserializeListOfMostPopularWikiArticlesFromCsvFile(titleFiles);
+                wikiArticlesToProcess = PopularWikiArticleTitlesBuilder.getInstance().deserializeListOfMostPopularWikiArticlesFromCsvFile(titleFiles);
             } else {
                 //TODO ugly code.. could reduce redundancy but quick n dirty first!
                 if (numberOfPopularArticles == null || numberOfPopularArticles > 1000)
                     numberOfPopularArticles = 1000;
                 // get popular article titles of german, english and spanish wikipedia articles
-                List<String> popularArticleTitlesDe = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.DE, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
-                List<String> popularArticleTitlesEn = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.EN, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
-                List<String> popularArticleTitlesEs = PopularWikiArticlesListBuilder.getListOfMostPopularWikiArticles(Language.ES, numberOfPopularArticles, PopularWikiArticlesListBuilder.ListOrdering.ASC);
+                List<String> popularArticleTitlesDe = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.DE, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.ASC);
+                List<String> popularArticleTitlesEn = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.EN, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.ASC);
+                List<String> popularArticleTitlesEs = PopularWikiArticleTitlesBuilder.getInstance().getListOfMostPopularWikiArticles(Language.ES, numberOfPopularArticles, PopularWikiArticleTitlesBuilder.ListOrdering.ASC);
                 wikiArticlesToProcess = new ArrayList<>();
                 for (String title : popularArticleTitlesDe)
                     wikiArticlesToProcess.add(Pair.of(Language.DE, title));
@@ -102,8 +102,8 @@ public class WikiArticleReader extends JCasCollectionReader_ImplBase {
      */
     @Override
     public void getNext(JCas jCas) throws IOException, CollectionException {
-    	WikiArticle currentArticle = wikiArticles.get(currentArticleIdx++);
-    	jCas.setDocumentLanguage(currentArticle.getLanguage().toString());
+        WikiArticle currentArticle = wikiArticles.get(currentArticleIdx++);
+        jCas.setDocumentLanguage(currentArticle.getLanguage().toString());
         jCas.setDocumentText(currentArticle.getContentAsString());
     }
 

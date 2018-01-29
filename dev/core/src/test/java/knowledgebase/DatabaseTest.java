@@ -356,9 +356,4 @@ public class DatabaseTest {
 			fail("Unable to manage database");
 		}
 	}
-	
-	@Test
-	public void testLanguageDetection() {
-		// TODO
-	}
 }

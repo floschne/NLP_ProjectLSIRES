@@ -1,8 +1,9 @@
 package client;
 
+import data.input.WikiHttpApiLoader;
 import data.input.Language;
 import data.input.WikiArticle;
-import data.input.WikiHttpApiLoader;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -66,10 +67,10 @@ public class ElasticSearchClientTest {
     @Test
     @Ignore
     public void searchTest() throws IOException {
-        List<String> ret = this.client.findArticleTitlesByLanguageCodeAndQuery("de", "Pizza macht freude");
+        List<Pair<String, Float>> ret = this.client.findArticleTitlesByLanguageCodeAndQuery("de", "Pizza macht freude");
 
-        for (String s : ret) {
-            System.out.println(s);
+        for (Pair<String, Float> p : ret) {
+            System.out.println("Article ID: " + p.getLeft() + " - Score: " + p.getRight());
         }
     }
 
