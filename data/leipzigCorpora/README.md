@@ -1,3 +1,6 @@
+# Leipzig Sentences Corpora 
+[http://wortschatz.uni-leipzig.de/de/download](http://wortschatz.uni-leipzig.de/de/download)
+
 # Nutzungsbedingungen
 Die vom Projekt Deutscher Wortschatz zur Verfügung gestellten Daten sind urheberrechtlich geschützt. Sie werden zur Nutzung für private und wissenschaftliche Zwecke unentgeltlich unter der Creative-Commons-Lizenz CC BY-NC zur Verfügung gestellt. Jede über die im WWW bereitgestellten Abfragemöglichkeiten hinausgehende Nutzung, automatisierte Abfragen (außer über unsere RESTful-Webservices) sowie eine kommerzielle Nutzung der Daten sind ohne ausdrückliche schriftliche Zustimmung der Projektleitung untersagt. 
 Die zum Download angebotenen Textkorpora werden unter der Creative-Commons-Lizenz CC BY zur Verfügung gestellt. Bei Bedarf an größeren Datenmengen, wenden Sie sich bitte an uns. 
