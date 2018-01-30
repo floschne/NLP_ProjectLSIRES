@@ -16,7 +16,7 @@ The basic idea is to detect the language of a query and get query results of Ela
     * ```deployment/elasticsearch/create_index.sh localhost 9200 en```
     * ```deployment/elasticsearch/create_index.sh localhost 9200 es```
 * Build the Application
-    * ```cd dev/ && mvn clean verify package && cd ..```
+    * ```cd dev/ && mvn clean verify package install && cd ..```
 * Create the Knowledge Datatbase to initialize Language Detection
     * Run the 'DatabaseUpdatePipeline' (best via IntelliJ)
 * Run ```cd dev/web/ && mvn spring-boot:run```
