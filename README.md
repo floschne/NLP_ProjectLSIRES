@@ -3,7 +3,7 @@
 
 # NLP Project LSIRES
 Natural Language Project - Language Specific Information Retrieval with ElasticSearch
-This is students M.Sc. project on NLP lecture from University of Hamburg
+This is a students' M.Sc. project for the NLP4Web lecture at the University of Hamburg.
 ## Basic Idea
 The basic idea is to detect the language of a query and get query results of ElasticSearch only in the detected language.
 
